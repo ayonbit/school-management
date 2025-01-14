@@ -51,7 +51,7 @@ const menuItems = [
         href: "/attendance",
       },
       {
-        icon: "/Calendar.png",
+        icon: "/calendar.png",
         label: "Events",
         href: "/events",
       },
