@@ -1,5 +1,5 @@
 /** @type {import('tailwindcss').Config} */
-export default {
+const tailwindConfig = {
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -7,11 +7,22 @@ export default {
   ],
   theme: {
     extend: {
+      backgroundImage: {
+        "gradient-redial": "radial-gradient(var(--tw-gradient-stops))",
+        "gradient-conic":
+          "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+      },
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+        ayonSky: "#C3EBFA",
+        ayonSkyLight: "#EDF9FD",
+        ayonPurple:"#CFCEFF",
+        ayonPurpleLight:"#F1F0FF",
+        ayonYellow : "#FAE27C",
+        ayonYellowLight : "#FEFCE8",
       },
     },
   },
   plugins: [],
 };
+
+export default tailwindConfig;

@@ -18,7 +18,7 @@ const DashboardLayout = ({ children }) => {
         <Menu />
       </div>
       {/* right */}
-      <div className="w-[84%] md:w-[92%] lg:w-[84%] xl:w-[86%] bg-[#F7F8FA] overflow-scroll ">
+      <div className="w-[84%] md:w-[92%] lg:w-[84%] xl:w-[86%] bg-[#F7F8FA] overflow-scroll hide-scrollbar ">
         <Navbar/>
         {children}
       </div>
