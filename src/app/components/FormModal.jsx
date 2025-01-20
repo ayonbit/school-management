@@ -1,8 +1,29 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useState } from "react";
+// import StudentForm from "./Forms/StudentForm";
+// import TeacherForm from "./Forms/TeacherForm";
 
+const TeacherForm = dynamic(() => import("./Forms/TeacherForm"), {
+  loading: () => <h1>Loading...</h1>,
+});
+
+const StudentForm = dynamic(() => import("./Forms/StudentForm"), {
+  loading: () => <h1>Loading...</h1>,
+});
+
+// const forms: {
+//   [key: string]: (type: " create" | "update", data?: any) => JSX.Element,
+// } = {
+//   teacher: (type, data) => <TeacherForm type={type} data={data} />,
+//   student: (type, data) => <StudentForm type={type} data={data} />,
+// }; // TSX
+const forms = {
+  teacher: (type, data) => <TeacherForm type={type} data={data} />,
+  student: (type, data) => <StudentForm type={type} data={data} />,
+};
 const FormModal = ({ table, type, data, id }) => {
   const size = type === "create" ? "w-8 h-8" : "w-7 h-7";
   const bgColor =
@@ -25,9 +46,13 @@ const FormModal = ({ table, type, data, id }) => {
         <button className="bg-red-700 text-white py-2 px-4 rounded-md border-none  w-max self-center">
           Delete
         </button>
-      </form> 
+      </form>
+    ) : type === "create" || type === "update" ? (
+      // <TeacherForm type="update" data={data} />
+      // <StudentForm type="create" />
+      forms[table](type, data)
     ) : (
-      "create or update a from"
+      "Form Not Found!"
     );
   };
 

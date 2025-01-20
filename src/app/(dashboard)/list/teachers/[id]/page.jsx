@@ -1,9 +1,11 @@
 import Announcements from "@/app/components/Announcement";
 import BigCalendar from "@/app/components/BigCalendar";
+import FormModal from "@/app/components/FormModal";
 import Performance from "@/app/components/Performance";
 
 import Image from "next/image";
 import Link from "next/link";
+
 const SingleTeacherPage = () => {
   return (
     <div className="flex-1 p-4 flex flex-col gap-4 xl:flex-row">
@@ -25,6 +27,24 @@ const SingleTeacherPage = () => {
             <div className="w-2/3 flex flex-col justify-between gap-4">
               <div className="flex items-center gap-4">
                 <h1 className="text-xl font-semibold">Leonard Snyder</h1>
+                <FormModal
+                  table="teacher"
+                  type="update"
+                  data={{
+                    id: 1,
+                    userName: "johndoe",
+                    email: "john@doe.com",
+                    password: "password",
+                    firstName: "John",
+                    lastName: "Doe",
+                    phone: "1234567890",
+                    address: "123 Main St, Anytown, USA",
+                    bloodType: "B+",
+                    dob: "2000-01-01",
+                    sex: "male",
+                    img: "https://images.pexels.com/photos/2888150/pexels-photo-2888150.jpeg?auto=compress&cs=tinysrgb&w=1200",
+                  }}
+                />
               </div>
               <p className="text-sm text-gray-500">
                 Lorem ipsum, dolor sit amet consectetur adipisicing elit.
