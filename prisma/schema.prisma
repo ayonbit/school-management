@@ -13,17 +13,18 @@ model Admin {
 }
 
 model Student {
-  id        String   @id
-  username  String   @unique
+  id        String    @id
+  username  String    @unique
   name      String
   surname   String
-  email     String?  @unique
-  phone     String?  @unique
+  email     String?   @unique
+  phone     String?   @unique
   address   String
   img       String?
   bloodType String
+  birthday  DateTime?
   sex       UserSex
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
 
   attendance Attendance[]
   result     Result[]
@@ -37,17 +38,18 @@ model Student {
 }
 
 model Teacher {
-  id        String   @id
-  username  String   @unique
+  id        String    @id
+  username  String    @unique
   name      String
   surname   String
-  email     String?  @unique
-  phone     String?  @unique
+  email     String?   @unique
+  phone     String?   @unique
   address   String
   img       String?
   bloodType String
+  birthday  DateTime?
   sex       UserSex
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
 
   subjects Subject[]
   lessons  Lessons[]
@@ -85,10 +87,10 @@ model Class {
   event        Events[]
   announcement Announcement[]
 
-  supervisorId String
-  supervisor   Teacher @relation(fields: [supervisorId], references: [id])
+  supervisorId String?
+  supervisor   Teacher? @relation(fields: [supervisorId], references: [id])
   gradeId      Int
-  grade        Grade   @relation(fields: [gradeId], references: [id])
+  grade        Grade    @relation(fields: [gradeId], references: [id])
 }
 
 model Subject {
@@ -158,7 +160,7 @@ model Attendance {
   id      Int      @id @default(autoincrement())
   date    DateTime
   present Boolean
-  absent  Boolean
+ 
 
   studentId String
   student   Student @relation(fields: [studentId], references: [id])
