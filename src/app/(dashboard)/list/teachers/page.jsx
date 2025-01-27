@@ -7,6 +7,8 @@ import Image from "next/image";
 import Link from "next/link";
 
 import prisma from "@/app/lib/prisma";
+import { Item_Per_Page } from "@/app/lib/settings";
+
 const columns = [
   {
     header: "Info",
@@ -32,7 +34,6 @@ const columns = [
     accessor: "lessons",
     className: "hidden md:table-cell",
   },
-
   {
     header: "Phone",
     accessor: "phone",
@@ -43,7 +44,6 @@ const columns = [
     accessor: "address",
     className: "hidden lg:table-cell",
   },
-
   {
     header: "Actions",
     accessor: "action",
@@ -59,7 +59,7 @@ const renderRow = (item) => {
       <td className="flex items-center gap-4 p-4">
         <Image
           src={item.img || "/noAvatar.png"}
-          alt="profileImage"
+          alt="teacherPhoto"
           width={40}
           height={40}
           className="md:hidden xl:block w-10 h-10 rounded-full object-cover"
@@ -74,7 +74,7 @@ const renderRow = (item) => {
         {item.subjects.map((subject) => subject.name).join(",")}
       </td>
       <td className="hidden md:table-cell ">
-        {item.classes.map((classitemName) => classitemName.name).join(",")}
+        {item.classes.map((classItemName) => classItemName.name).join(",")}
       </td>
       <td className="hidden md:table-cell ">
         {item.lessons.map((lessonsItemName) => lessonsItemName.name).join(",")}
@@ -90,14 +90,6 @@ const renderRow = (item) => {
             </button>
           </Link>
           {role === "admin" && (
-            // <button className="w-7 h-7 flex items-center justify-center rounded-full bg-ayonPurple">
-            //   <Image
-            //     src="/delete.png"
-            //     alt="viewButton"
-            //     width={16}
-            //     height={16}
-            //   />
-            // </button>
             <FormModal table="teacher" type="delete" id={item.id} />
           )}
         </div>
@@ -106,15 +98,57 @@ const renderRow = (item) => {
   );
 };
 
-const TeachersListPage = async () => {
-  const data = await prisma.teacher.findMany({
-    include: {
-      subjects: true,
-      classes: true,
-      lessons: true,
-    },
-  });
-  console.log(data);
+const TeachersListPage = async ({ searchParams }) => {
+  const params = await searchParams;
+  const { page, ...queryParams } = params;
+  const p = parseInt(page) || 1;
+
+  //URL PARAMS CONDITIONS
+  const query = {};
+
+  if (queryParams) {
+    for (const [key, value] of Object.entries(queryParams)) {
+      if (value !== undefined) {
+        switch (key) {
+          case "classId": {
+            query.lessons = {
+              some: {
+                classId: parseInt(value),
+              },
+            };
+            break;
+          }
+          case "search": {
+            query.name = { contains: value, mode: "insensitive" };
+            break;
+          }
+          // Add more cases as needed
+        }
+      }
+    }
+  }
+  const [data, count] = await prisma.$transaction([
+    prisma.teacher.findMany({
+      // where: {
+      //   lessons: {
+      //     some: { classId: parseInt(queryParams.classId) },
+      //   },
+      // },
+      where: query,
+
+      include: {
+        subjects: true,
+        classes: true,
+        lessons: true,
+      },
+      take: Item_Per_Page,
+      skip: Item_Per_Page * (p - 1),
+    }),
+    prisma.teacher.count({
+      where: query,
+    }),
+  ]);
+
   return (
     <div className="bg-white p-4 rounded-md flex-1 m-4 mt-0">
       {/*TOP*/}
@@ -129,12 +163,7 @@ const TeachersListPage = async () => {
             <button className="w-8 h-8 flex items-center justify-center rounded-full bg-ayonYellow">
               <Image src="/sort.png" alt="filter" width={14} height={14} />
             </button>
-            {role === "admin" && (
-              // <button className="w-8 h-8 flex items-center justify-center rounded-full bg-ayonYellow">
-              //   <Image src="/plus.png" alt="filter" width={14} height={14} />
-              // </button>
-              <FormModal table="teacher" type="create" />
-            )}
+            {role === "admin" && <FormModal table="teacher" type="create" />}
           </div>
         </div>
       </div>
@@ -144,8 +173,7 @@ const TeachersListPage = async () => {
       </div>
 
       {/* PAGINATION */}
-
-      <Pagination />
+      <Pagination page={p} count={count} />
     </div>
   );
 };
