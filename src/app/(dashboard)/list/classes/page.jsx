@@ -42,7 +42,9 @@ const renderRow = (item) => {
       <td className="flex items-center gap-4 p-4">{item.name}</td>
       <td className="hidden md:table-cell">{item.capacity}</td>
       <td className="hidden md:table-cell">{item.name[0]}</td>
-      <td className="hidden md:table-cell">{item.supervisor.name}</td>
+      <td className="hidden md:table-cell">
+        {item.supervisor.name + " " + item.supervisor.surname}
+      </td>
       <td>
         <div className="flex items-center gap-2">
           {/* <Link href={`/list/teachers/${item.id}`}>
