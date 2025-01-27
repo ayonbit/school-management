@@ -123,6 +123,8 @@ const TeachersListPage = async ({ searchParams }) => {
             break;
           }
           // Add more cases as needed
+          default:
+            break;
         }
       }
     }

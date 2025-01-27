@@ -113,6 +113,8 @@ const StudentsListPage = async ({ searchParams }) => {
             query.name = { contains: value, mode: "insensitive" };
             break;
           }
+          default:
+            break;
           // Add more cases as needed
         }
       }
