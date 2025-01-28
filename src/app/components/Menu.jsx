@@ -116,7 +116,7 @@ const menuItems = [
     ],
   },
 ];
-const Menu = () => {
+const Menu = async () => {
   return (
     <div className=" mt-4 text-sm">
       {menuItems.map((i) => (
