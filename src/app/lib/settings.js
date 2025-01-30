@@ -1,7 +1,6 @@
 export const Item_Per_Page = 10;
 
-
-export const routesAccessMap  = {
+export const routesAccessMap = {
   "/admin(.*)": ["admin"],
   "/student(.*)": ["student"],
   "/teacher(.*)": ["teacher"],
@@ -18,4 +17,3 @@ export const routesAccessMap  = {
   "/list/events": ["admin", "teacher", "student", "parent"],
   "/list/announcements": ["admin", "teacher", "student", "parent"],
 };
-

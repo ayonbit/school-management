@@ -10,11 +10,11 @@ import Image from "next/image";
 
 const columns = [
   {
-    header: "Info",
+    header: "Parent Name",
     accessor: "info",
   },
   {
-    header: "Student Names",
+    header: "Student Name",
     accessor: "student",
     className: "hidden md:table-cell",
   },
