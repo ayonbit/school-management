@@ -15,11 +15,10 @@ const renderRow = (item, role) => {
       className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-ayonPurpleLight"
     >
       <td className="flex items-center gap-4 p-4">{item.title}</td>
-      <td>{item.class.name}</td>
+      <td>{item.class?.name || "N/A"}</td>
       <td className="hidden md:table-cell">
-        {new Intl.DateTimeFormat("en-US").format(item.date)}
+        {new Intl.DateTimeFormat("en-US").format(new Date(item.date))}
       </td>
-
       <td>
         <div className="flex items-center gap-2">
           {role === "admin" && (
@@ -37,13 +36,17 @@ const renderRow = (item, role) => {
 const AnnouncementListPage = async ({ searchParams }) => {
   try {
     const authResponse = await auth();
-    const { sessionClaims } = authResponse || {};
+    const { sessionClaims, userId: currentUserId } = authResponse || {};
+
     if (!sessionClaims) {
       console.error(
         "No session claims found. User might not be authenticated."
       );
+      return <div>Error loading announcements.</div>;
     }
+
     const role = sessionClaims?.metadata?.role;
+
     const params = await searchParams;
     const { page, ...queryParams } = params;
     const p = parseInt(page) || 1;
@@ -63,6 +66,41 @@ const AnnouncementListPage = async ({ searchParams }) => {
           }
         }
       }
+    }
+
+    // Role Base Conditions
+    switch (role) {
+      case "admin":
+        break;
+      case "teacher":
+        query.class = {
+          lessons: {
+            some: {
+              teacherId: currentUserId,
+            },
+          },
+        };
+        break;
+      case "student":
+        query.class = {
+          students: {
+            some: {
+              id: currentUserId,
+            },
+          },
+        };
+        break;
+      case "parent":
+        query.class = {
+          students: {
+            some: {
+              parentId: currentUserId,
+            },
+          },
+        };
+        break;
+      default:
+        break;
     }
 
     const [data, count] = await prisma.$transaction([
@@ -105,7 +143,7 @@ const AnnouncementListPage = async ({ searchParams }) => {
 
     return (
       <div className="bg-white p-4 rounded-md flex-1 m-4 mt-0">
-        {/*TOP*/}
+        {/* TOP */}
         <div className="flex items-center justify-between">
           <h1 className=" hidden md:block text-lg font-semibold">
             All Announcements

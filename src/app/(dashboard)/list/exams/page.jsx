@@ -2,38 +2,12 @@ import FormModal from "@/app/components/FormModal";
 import Pagination from "@/app/components/Pagination";
 import Table from "@/app/components/Table";
 import TableSearch from "@/app/components/TableSearch";
-import { role } from "@/app/lib/data";
 import prisma from "@/app/lib/prisma";
 import { Item_Per_Page } from "@/app/lib/settings";
-
+import { auth } from "@clerk/nextjs/server";
 import Image from "next/image";
 
-const columns = [
-  {
-    header: "Subject Name",
-    accessor: "subject",
-  },
-  {
-    header: "Class",
-    accessor: "class",
-  },
-  {
-    header: "Teacher",
-    accessor: "teacher",
-    className: "hidden md:table-cell",
-  },
-  {
-    header: "Date",
-    accessor: "date",
-    className: "hidden md:table-cell",
-  },
-  {
-    header: "Actions",
-    accessor: "action",
-  },
-];
-
-const renderRow = (item) => {
+const renderRow = (item, role) => {
   return (
     <tr
       key={item.id}
@@ -51,7 +25,7 @@ const renderRow = (item) => {
       </td>
       <td>
         <div className="flex items-center gap-2">
-          {role === "admin" && (
+          {(role === "admin" || role === "teacher") && (
             <>
               <FormModal table="exams" type="update" data={item} />
               <FormModal table="exams" type="delete" id={item.id} />
@@ -64,6 +38,16 @@ const renderRow = (item) => {
 };
 
 const ExamListPage = async ({ searchParams }) => {
+  const authResponse = await auth();
+  const { sessionClaims, userId: currentUserId } = authResponse || {};
+
+  if (!sessionClaims) {
+    console.error("No session claims found. User might not be authenticated.");
+    return <div>Error loading exams.</div>;
+  }
+
+  const role = sessionClaims?.metadata?.role;
+
   const params = await searchParams;
   const { page, ...queryParams } = params;
   const p = parseInt(page) || 1;
@@ -76,13 +60,14 @@ const ExamListPage = async ({ searchParams }) => {
       if (value !== undefined) {
         switch (key) {
           case "classId":
-            query.lesson = { classId: parseInt(value) };
+            query.lesson = { ...query.lesson, classId: parseInt(value) };
             break;
           case "teacherId":
-            query.lesson = { teacherId: value };
+            query.lesson = { ...query.lesson, teacherId: value };
             break;
           case "search":
             query.lesson = {
+              ...query.lesson,
               subject: { name: { contains: value, mode: "insensitive" } },
             };
             break;
@@ -91,6 +76,41 @@ const ExamListPage = async ({ searchParams }) => {
         }
       }
     }
+  }
+
+  // role base conditions
+  switch (role) {
+    case "admin":
+      break;
+    case "teacher":
+      query.lesson = { ...query.lesson, teacherId: currentUserId };
+      break;
+    case "student":
+      query.lesson = {
+        ...query.lesson,
+        class: {
+          students: {
+            some: {
+              id: currentUserId,
+            },
+          },
+        },
+      };
+      break;
+    case "parent":
+      query.lesson = {
+        ...query.lesson,
+        class: {
+          students: {
+            some: {
+              parentId: currentUserId,
+            },
+          },
+        },
+      };
+      break;
+    default:
+      break;
   }
 
   const [data, count] = await prisma.$transaction([
@@ -112,6 +132,34 @@ const ExamListPage = async ({ searchParams }) => {
       where: query,
     }),
   ]);
+  const columns = [
+    {
+      header: "Subject Name",
+      accessor: "subject",
+    },
+    {
+      header: "Class",
+      accessor: "class",
+    },
+    {
+      header: "Teacher",
+      accessor: "teacher",
+      className: "hidden md:table-cell",
+    },
+    {
+      header: "Date",
+      accessor: "date",
+      className: "hidden md:table-cell",
+    },
+    ...(role === "admin" || role === "teacher"
+      ? [
+          {
+            header: "Actions",
+            accessor: "action",
+          },
+        ]
+      : []),
+  ];
 
   return (
     <div className="bg-white p-4 rounded-md flex-1 m-4 mt-0">
@@ -127,13 +175,19 @@ const ExamListPage = async ({ searchParams }) => {
             <button className="w-8 h-8 flex items-center justify-center rounded-full bg-ayonYellow">
               <Image src="/sort.png" alt="filter" width={14} height={14} />
             </button>
-            {role === "admin" && <FormModal table="exams" type="create" />}
+            {(role === "admin" || role === "teacher") && (
+              <FormModal table="exams" type="create" />
+            )}
           </div>
         </div>
       </div>
       {/* LIST */}
       <div>
-        <Table columns={columns} renderRow={renderRow} data={data} />
+        <Table
+          columns={columns}
+          renderRow={(item) => renderRow(item, role)}
+          data={data}
+        />
       </div>
 
       {/* PAGINATION */}

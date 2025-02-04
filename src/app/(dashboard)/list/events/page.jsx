@@ -84,21 +84,23 @@ const EventListPage = async ({ searchParams }) => {
 
     //   // Role Base Conditions
 
-    //   const roleConditions = {
-    //     teacher: { class: { lessons: { some: { teacherId: currentUserId } } } },
-    //     student: { class: { students: { some: { id: currentUserId } } } },
-    //     parent: { class: { students: { some: { parentId: currentUserId } } } },
-    //   };
+    // const roleConditions = {
+    //   teacher: { class: { lessons: { some: { teacherId: currentUserId } } } },
+    //   student: { class: { students: { some: { id: currentUserId } } } },
+    //   parent: { class: { students: { some: { parentId: currentUserId } } } },
+    // };
 
     // {
     //  =>* NOT WORKING * ##CLASS ID NULL not working
     // =>** when general event is created under no classId it not working ,
     // => if no classId it should be work for all roles
 
-    // query.OR = [{classId : null},{
-    //     class:roleConditions[role] || {}
-    //   }]
-    //}
+    // query.OR = [
+    //   { classId: null },
+    //   {
+    //     class: roleConditions[role] || {},
+    //   },
+    // ];
 
     // Role Base Conditions
     switch (role) {
@@ -134,6 +136,8 @@ const EventListPage = async ({ searchParams }) => {
       default:
         break;
     }
+
+    // query.OR = [{ classId: null }, { class: query.classId[role] || {} }];
 
     const [data, count] = await prisma.$transaction([
       prisma.events.findMany({

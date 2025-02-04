@@ -2,55 +2,13 @@ import FormModal from "@/app/components/FormModal";
 import Pagination from "@/app/components/Pagination";
 import Table from "@/app/components/Table";
 import TableSearch from "@/app/components/TableSearch";
-import { role } from "@/app/lib/data";
+import prisma from "@/app/lib/prisma";
+import { Item_Per_Page } from "@/app/lib/settings";
+import { auth } from "@clerk/nextjs/server";
 import Image from "next/image";
 import Link from "next/link";
 
-import prisma from "@/app/lib/prisma";
-import { Item_Per_Page } from "@/app/lib/settings";
-
-const columns = [
-  {
-    header: "Info",
-    accessor: "info",
-  },
-  {
-    header: "Teacher ID",
-    accessor: "teacherId",
-    className: "hidden md:table-cell",
-  },
-  {
-    header: "Subjects",
-    accessor: "subjects",
-    className: "hidden md:table-cell",
-  },
-  {
-    header: "Classes",
-    accessor: "classes",
-    className: "hidden md:table-cell",
-  },
-  {
-    header: "Lessons",
-    accessor: "lessons",
-    className: "hidden md:table-cell",
-  },
-  {
-    header: "Phone",
-    accessor: "phone",
-    className: "hidden lg:table-cell",
-  },
-  {
-    header: "Address",
-    accessor: "address",
-    className: "hidden lg:table-cell",
-  },
-  {
-    header: "Actions",
-    accessor: "action",
-  },
-];
-
-const renderRow = (item) => {
+const renderRow = (item, role) => {
   return (
     <tr
       key={item.id}
@@ -81,7 +39,6 @@ const renderRow = (item) => {
       </td>
       <td className="hidden md:table-cell ">{item.phone} </td>
       <td className="hidden md:table-cell ">{item.address} </td>
-
       <td>
         <div className="flex items-center gap-2">
           <Link href={`/list/teachers/${item.id}`}>
@@ -90,7 +47,10 @@ const renderRow = (item) => {
             </button>
           </Link>
           {role === "admin" && (
-            <FormModal table="teacher" type="delete" id={item.id} />
+            <>
+              <FormModal table="teacher" type="update" data={item} />
+              <FormModal table="teacher" type="delete" id={item.id} />
+            </>
           )}
         </div>
       </td>
@@ -99,11 +59,21 @@ const renderRow = (item) => {
 };
 
 const TeachersListPage = async ({ searchParams }) => {
+  const authResponse = await auth();
+  const { sessionClaims } = authResponse || {};
+
+  if (!sessionClaims) {
+    console.error("No session claims found. User might not be authenticated.");
+    return <div>Error loading teachers.</div>;
+  }
+
+  const role = sessionClaims?.metadata?.role;
+
   const params = await searchParams;
   const { page, ...queryParams } = params;
   const p = parseInt(page) || 1;
 
-  //URL PARAMS CONDITIONS
+  // URL PARAMS CONDITIONS
   const query = {};
 
   if (queryParams) {
@@ -129,15 +99,10 @@ const TeachersListPage = async ({ searchParams }) => {
       }
     }
   }
+//NO Role Base Conditions . Only Admin Can run CRUD Operations
   const [data, count] = await prisma.$transaction([
     prisma.teacher.findMany({
-      // where: {
-      //   lessons: {
-      //     some: { classId: parseInt(queryParams.classId) },
-      //   },
-      // },
       where: query,
-
       include: {
         subjects: true,
         classes: true,
@@ -150,10 +115,53 @@ const TeachersListPage = async ({ searchParams }) => {
       where: query,
     }),
   ]);
-
+  const columns = [
+    {
+      header: "Info",
+      accessor: "info",
+    },
+    {
+      header: "Teacher ID",
+      accessor: "teacherId",
+      className: "hidden md:table-cell",
+    },
+    {
+      header: "Subjects",
+      accessor: "subjects",
+      className: "hidden md:table-cell",
+    },
+    {
+      header: "Classes",
+      accessor: "classes",
+      className: "hidden md:table-cell",
+    },
+    {
+      header: "Lessons",
+      accessor: "lessons",
+      className: "hidden md:table-cell",
+    },
+    {
+      header: "Phone",
+      accessor: "phone",
+      className: "hidden lg:table-cell",
+    },
+    {
+      header: "Address",
+      accessor: "address",
+      className: "hidden lg:table-cell",
+    },
+    ...(role === "admin"
+      ? [
+          {
+            header: "Actions",
+            accessor: "action",
+          },
+        ]
+      : []),
+  ];
   return (
     <div className="bg-white p-4 rounded-md flex-1 m-4 mt-0">
-      {/*TOP*/}
+      {/* TOP */}
       <div className="flex items-center justify-between">
         <h1 className=" hidden md:block text-lg font-semibold">All Teachers</h1>
         <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
@@ -171,9 +179,12 @@ const TeachersListPage = async ({ searchParams }) => {
       </div>
       {/* LIST */}
       <div>
-        <Table columns={columns} renderRow={renderRow} data={data} />
+        <Table
+          columns={columns}
+          renderRow={(item) => renderRow(item, role)}
+          data={data}
+        />
       </div>
-
       {/* PAGINATION */}
       <Pagination page={p} count={count} />
     </div>
