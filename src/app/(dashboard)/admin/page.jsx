@@ -1,6 +1,5 @@
 import Announcement from "@/app/components/Announcement";
-import AttendanceChart from "@/app/components/AttendanceChart";
-import CountChart from "@/app/components/CountChart";
+import AttendanceChartContainer from "@/app/components/AttendanceChartContainer";
 import CountChartContainer from "@/app/components/CountChartContainer";
 import EventCalendar from "@/app/components/EventCalendar";
 import FinanceChart from "@/app/components/FinanceChart";
@@ -27,7 +26,7 @@ const AdminPage = () => {
           </div>
           {/*Attendance Chart*/}
           <div className="w-full lg:w-2/3 h-[450px]">
-            <AttendanceChart />
+            <AttendanceChartContainer />
           </div>
         </div>
         <div className="w-full h-[500px]">
