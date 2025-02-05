@@ -10,7 +10,6 @@ const UserCard = async ({ type }) => {
   };
 
   const count = await modelMap[type].count();
-  console.log(count);
 
   return (
     <div className="rounded-2xl odd:bg-ayonPurple even:bg-ayonYellow p-4 flex-1 min-w-[130px]">
