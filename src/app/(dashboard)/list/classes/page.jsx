@@ -16,9 +16,11 @@ const renderRow = (item, role) => {
     >
       <td className="flex items-center gap-4 p-4">{item.name}</td>
       <td className="hidden md:table-cell">{item.capacity}</td>
-      <td className="hidden md:table-cell">{item.grade.level}</td>
+      <td className="hidden md:table-cell">{item.grade?.level || "N/A"}</td>
       <td className="hidden md:table-cell">
-        {item.supervisor.name + " " + item.supervisor.surname}
+        {item.supervisor
+          ? `${item.supervisor.name} ${item.supervisor.surname}`
+          : "No Supervisor"}
       </td>
       <td>
         <div className="flex items-center gap-2">

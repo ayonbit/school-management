@@ -10,8 +10,6 @@ const BigCalendarContainer = async ({ type, id }) => {
       },
     });
 
-
-
     if (!dataRes || dataRes.length === 0) {
       console.warn("No lessons found for the given ID:", id);
       return <p>No schedule available.</p>;
@@ -33,11 +31,10 @@ const BigCalendarContainer = async ({ type, id }) => {
       })
       .filter(Boolean); // Remove null values
 
-
     const schedule = adjustScheduleToCurrentWeek(data);
 
     return (
-      <div>
+      <div className="">
         <BigCalendar data={schedule} />
       </div>
     );
