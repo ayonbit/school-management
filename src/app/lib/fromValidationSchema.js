@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-// Schema validation
-export const SubjectSchema = z.object({
+export const subjectSchema = z.object({
   id: z.coerce.number().optional(),
-  name: z.string().min(1, { message: "Subject Name is required !" }),
+  name: z.string().min(1, { message: "Subject name is required!" }),
+  teachers: z.array(z.string()), //teacher ids
 });

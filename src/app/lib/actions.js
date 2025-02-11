@@ -1,52 +1,80 @@
 "use server";
+
+import { subjectSchema } from "./fromValidationSchema";
 import prisma from "./prisma";
 
+// Shared validation function
+const validateSubjectData = (data) => {
+  const validation = subjectSchema.safeParse(data);
+  if (!validation.success) {
+    return { success: false, error: validation.error.errors[0].message };
+  }
+  return { success: true, error: null };
+};
+
+//create Subject
 export const createSubject = async (data) => {
   try {
     // Validate input
-    if (!data.name || data.name.trim() === "") {
-      return { success: false, error: "Subject name is required" };
-    }
+    const validation = validateSubjectData(data);
+    if (!validation.success) return validation;
 
     // Insert into database
-    await prisma.Subject.create({ data: { name: data.name } });
-
-    // Revalidate cache
-    // revalidatePath("/list/subjects");
-
-    return { success: true, error: null };
-  } catch (error) {
-    console.error("Create Subject Error:", error);
-    return { success: false, error: "Failed to create subject" };
-  }
-};
-
-export const updateSubject = async (id, data) => {
-  try {
-    // Validate input
-    if (!data.name || data.name.trim() === "") {
-      return { success: false, error: "Subject name is required" };
-    }
-
-    // Update subject in database
-    await prisma.Subject.update({
-      where: { id }, // Specify which subject to update
-      data: { name: data.name },
+    await prisma.subject.create({
+      data: {
+        name: data.name,
+        teachers: {
+          connect: data.teachers.map((teacherId) => ({ id: teacherId })),
+        },
+      },
     });
 
-    return { success: true, error: null };
-  } catch (error) {
-    console.error("Update Subject Error:", error);
-    return { success: false, error: "Failed to update subject" };
+    return { success: true, error: false };
+  } catch (err) {
+    console.log(err);
+    return { success: false, error: true };
   }
 };
 
-export async function deleteSubject(id) {
-  if (!id) return { success: false, error: "ID is required" };
+//Update Subject
+export const updateSubject = async (data) => {
   try {
-    await prisma.Subject.delete({ where: { id } });
-    return { success: true };
-  } catch (error) {
-    return { success: false, error: error.message };
+    // Validate input
+    const validation = validateSubjectData(data);
+    if (!validation.success) return validation;
+
+    //Update Db
+    await prisma.subject.update({
+      where: {
+        id: data.id,
+      },
+      data: {
+        name: data.name,
+        teachers: {
+          set: data.teachers.map((teacherId) => ({ id: teacherId })),
+        },
+      },
+    });
+
+    return { success: true, error: false };
+  } catch (err) {
+    console.log(err);
+    return { success: false, error: true };
   }
-}
+};
+
+export const deleteSubject = async (data) => {
+  const id = data.get("id");
+  try {
+    await prisma.subject.delete({
+      where: {
+        id: parseInt(id),
+      },
+    });
+
+    return { success: true, error: false };
+  } catch (err) {
+    console.log(err);
+    return { success: false, error: true };
+  }
+};
