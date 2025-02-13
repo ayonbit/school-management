@@ -5,11 +5,11 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "react-toastify";
-import { deleteSubject } from "../lib/actions";
+import { deleteClass, deleteSubject } from "../lib/actions";
 
 const deleteActionMap = {
   subject: deleteSubject,
-  //class: deleteClass,
+  class: deleteClass,
   //teacher: deleteTeacher,
   //student: deleteStudent,
   // exam: deleteExam,
@@ -25,16 +25,18 @@ const deleteActionMap = {
 
 // USE LAZY LOADING
 
-const TeacherForm = dynamic(() => import("./forms/TeacherForm"), {
+const TeacherForm = dynamic(() => import("./Forms/TeacherForm"), {
   loading: () => <h1>Loading...</h1>,
 });
-const StudentForm = dynamic(() => import("./forms/StudentForm"), {
+const StudentForm = dynamic(() => import("./Forms/StudentForm"), {
   loading: () => <h1>Loading...</h1>,
 });
-const SubjectForm = dynamic(() => import("./forms/SubjectForm"), {
+const SubjectForm = dynamic(() => import("./Forms/SubjectForm"), {
   loading: () => <h1>Loading...</h1>,
 });
-
+const ClassForm = dynamic(() => import("./Forms/ClassForm"), {
+  loading: () => <h1>Loading...</h1>,
+});
 // TODO: OTHER FORMS
 
 const forms = {

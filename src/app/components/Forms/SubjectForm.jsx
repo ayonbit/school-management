@@ -16,6 +16,11 @@ const SubjectForm = ({ type, data, setOpen, relatedData }) => {
     formState: { errors },
   } = useForm({
     resolver: zodResolver(subjectSchema),
+    defaultValues: {
+      name: data?.name || "",
+      id: data?.id || "",
+      teachers: data?.teachers || [],
+    },
   });
 
   const [state, setState] = useState({
@@ -32,15 +37,19 @@ const SubjectForm = ({ type, data, setOpen, relatedData }) => {
 
       if (result.success) {
         setState({ success: true, error: false });
-        toast(`Subject has been ${type === "create" ? "created" : "updated"}!`);
+        toast.success(
+          `Subject has been ${type === "create" ? "created" : "updated"}!`
+        );
         setOpen(false);
         router.refresh();
       } else {
         setState({ success: false, error: true });
+        toast.error("Something went wrong. Please try again.");
       }
     } catch (error) {
       setState({ success: false, error: true });
       console.error("Form submission error:", error);
+      toast.error("An unexpected error occurred. Please try again.");
     }
   });
 
@@ -56,7 +65,6 @@ const SubjectForm = ({ type, data, setOpen, relatedData }) => {
         <InputField
           label="Subject name"
           name="name"
-          defaultValue={data?.name}
           register={register}
           error={errors?.name}
         />
@@ -64,7 +72,6 @@ const SubjectForm = ({ type, data, setOpen, relatedData }) => {
           <InputField
             label="Id"
             name="id"
-            defaultValue={data?.id}
             register={register}
             error={errors?.id}
             hidden
@@ -76,7 +83,6 @@ const SubjectForm = ({ type, data, setOpen, relatedData }) => {
             multiple
             className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
             {...register("teachers")}
-            defaultValue={data?.teachers}
           >
             {teachers.map((teacher) => (
               <option value={teacher.id} key={teacher.id}>
@@ -94,7 +100,10 @@ const SubjectForm = ({ type, data, setOpen, relatedData }) => {
       {state.error && (
         <span className="text-red-500">Something went wrong!</span>
       )}
-      <button className="bg-blue-400 text-white p-2 rounded-md">
+      <button
+        type="submit"
+        className="bg-blue-400 text-white p-2 rounded-md hover:bg-blue-500 transition-colors"
+      >
         {type === "create" ? "Create" : "Update"}
       </button>
     </form>
