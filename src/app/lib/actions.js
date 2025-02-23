@@ -4,6 +4,7 @@
 import { clerkClient } from "@clerk/nextjs/server";
 import {
   classSchema,
+  examSchema,
   studentSchema,
   subjectSchema,
   teacherSchema,
@@ -340,7 +341,8 @@ export const createExam = async (data) => {
     //     return { success: false, error: true };
     //   }
     // }
-
+    const validation = validateData(data, examSchema);
+    if (!validation.success) return validation;
     await prisma.exam.create({
       data: {
         title: data.title,
@@ -350,7 +352,6 @@ export const createExam = async (data) => {
       },
     });
 
-    // revalidatePath("/list/subjects");
     return { success: true, error: false };
   } catch (err) {
     console.log(err);
@@ -375,7 +376,8 @@ export const updateExam = async (data) => {
     //     return { success: false, error: true };
     //   }
     // }
-
+    const validation = validateData(data, examSchema);
+    if (!validation.success) return validation;
     await prisma.exam.update({
       where: {
         id: data.id,
@@ -388,7 +390,6 @@ export const updateExam = async (data) => {
       },
     });
 
-    // revalidatePath("/list/subjects");
     return { success: true, error: false };
   } catch (err) {
     console.log(err);
@@ -410,7 +411,6 @@ export const deleteExam = async (data) => {
       },
     });
 
- 
     return { success: true, error: false };
   } catch (err) {
     console.log(err);

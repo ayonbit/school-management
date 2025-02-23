@@ -141,6 +141,7 @@ const ExamListPage = async ({ searchParams }) => {
       header: "Class",
       accessor: "class",
     },
+
     {
       header: "Teacher",
       accessor: "teacher",
