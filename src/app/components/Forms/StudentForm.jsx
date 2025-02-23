@@ -32,7 +32,7 @@ const StudentForm = ({ type, data, setOpen, relatedData }) => {
       console.log(result);
       if (result?.success) {
         toast.success(
-          `Teacher has been ${type === "create" ? "created" : "updated"}!`
+          `Student has been ${type === "create" ? "created" : "updated"}!`
         );
         router.refresh();
         setOpen(false);
@@ -151,7 +151,7 @@ const StudentForm = ({ type, data, setOpen, relatedData }) => {
             <div className="flex flex-col items-start gap-2 cursor-pointer">
               <div className="flex items-center gap-2">
                 <Image src="/upload.png" alt="Upload" width={28} height={28} />
-                <span onClick={open} className="text-xs text-gray-500">
+                <span onClick={() => open()} className="text-xs text-gray-500">
                   Upload a photo
                 </span>
               </div>
@@ -167,60 +167,63 @@ const StudentForm = ({ type, data, setOpen, relatedData }) => {
             </div>
           )}
         </CldUploadWidget>
+
+        {/* Dropdowns for Sex, Grade, and Class */}
+        <div className="flex justify-between flex-wrap gap-4">
+          <div className="flex flex-col gap-2 w-full md:w-1/4">
+            <label className="text-xs text-gray-500">Sex</label>
+            <select
+              className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
+              {...register("sex")}
+            >
+              <option value="MALE">Male</option>
+              <option value="FEMALE">Female</option>
+            </select>
+            {errors.sex?.message && (
+              <p className="text-xs text-red-400">{errors.sex.message}</p>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-2 w-full md:w-1/4">
+            <label className="text-xs text-gray-500">Grade</label>
+            <select
+              className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
+              {...register("gradeId")}
+            >
+              {grades.map((grade) => (
+                <option value={grade.id} key={grade.id}>
+                  {grade.level}
+                </option>
+              ))}
+            </select>
+            {errors.gradeId?.message && (
+              <p className="text-xs text-red-400">{errors.gradeId.message}</p>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-2 w-full md:w-1/4">
+            <label className="text-xs text-gray-500">Class</label>
+            <select
+              className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
+              {...register("classId")}
+            >
+              {classes.map((classItem) => (
+                <option value={classItem.id} key={classItem.id}>
+                  {classItem.name} - {classItem._count.students}/
+                  {classItem.capacity}
+                </option>
+              ))}
+            </select>
+            {errors.classId?.message && (
+              <p className="text-xs text-red-400">{errors.classId.message}</p>
+            )}
+          </div>
+        </div>
       </div>
 
-      {/* Dropdowns for Sex, Grade, and Class */}
-      <div className="flex justify-between flex-wrap gap-4">
-        <div className="flex flex-col gap-2 w-full md:w-1/4">
-          <label className="text-xs text-gray-500">Sex</label>
-          <select
-            className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
-            {...register("sex")}
-          >
-            <option value="MALE">Male</option>
-            <option value="FEMALE">Female</option>
-          </select>
-          {errors.sex?.message && (
-            <p className="text-xs text-red-400">{errors.sex.message}</p>
-          )}
-        </div>
-
-        <div className="flex flex-col gap-2 w-full md:w-1/4">
-          <label className="text-xs text-gray-500">Grade</label>
-          <select
-            className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
-            {...register("gradeId")}
-          >
-            {grades.map((grade) => (
-              <option value={grade.id} key={grade.id}>
-                {grade.level}
-              </option>
-            ))}
-          </select>
-          {errors.gradeId?.message && (
-            <p className="text-xs text-red-400">{errors.gradeId.message}</p>
-          )}
-        </div>
-
-        <div className="flex flex-col gap-2 w-full md:w-1/4">
-          <label className="text-xs text-gray-500">Class</label>
-          <select
-            className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
-            {...register("classId")}
-          >
-            {classes.map((classItem) => (
-              <option value={classItem.id} key={classItem.id}>
-                {classItem.name} - {classItem._count.students}/
-                {classItem.capacity}
-              </option>
-            ))}
-          </select>
-          {errors.classId?.message && (
-            <p className="text-xs text-red-400">{errors.classId.message}</p>
-          )}
-        </div>
-      </div>
-
+      {state.error && (
+        <span className="text-red-500">Something went wrong!</span>
+      )}
       {/* Submit Button */}
       <button type="submit" className="bg-blue-400 text-white p-2 rounded-md">
         {type === "create" ? "Create" : "Update"}
