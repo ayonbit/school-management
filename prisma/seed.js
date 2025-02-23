@@ -80,17 +80,15 @@ async function main() {
             },
           ],
         },
-        birthday: new Date(
-          new Date().setFullYear(new Date().getFullYear() - 30)
-        ),
-        sex: i % 2 === 0 ? UserSex.Male : UserSex.Female, // Alternate between Male and Female
+        dob: new Date(new Date().setFullYear(new Date().getFullYear() - 30)),
+        sex: i % 2 === 0 ? UserSex.MALE : UserSex.FEMALE, // Alternate between Male and Female
       },
     });
   }
 
   // LESSON
   for (let i = 1; i <= 30; i++) {
-    await prisma.lessons.create({
+    await prisma.lesson.create({
       data: {
         name: `Lesson${i}`,
         day: Day[
@@ -132,13 +130,11 @@ async function main() {
         phone: `987-654-321${i}`,
         address: `Address${i}`,
         bloodType: "O-",
-        sex: i % 2 === 0 ? UserSex.Male : UserSex.Female,
+        sex: i % 2 === 0 ? UserSex.MALE : UserSex.FEMALE,
         parentId: `parentId${Math.ceil(i / 2) % 25 || 25}`,
         gradeId: (i % 6) + 1,
         classId: (i % 6) + 1,
-        birthday: new Date(
-          new Date().setFullYear(new Date().getFullYear() - 10)
-        ),
+        dob: new Date(new Date().setFullYear(new Date().getFullYear() - 10)),
       },
     });
   }
@@ -192,7 +188,7 @@ async function main() {
 
   // EVENT
   for (let i = 1; i <= 5; i++) {
-    await prisma.events.create({
+    await prisma.event.create({
       data: {
         title: `Event ${i}`,
         description: `Description for Event ${i}`,

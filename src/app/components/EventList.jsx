@@ -9,7 +9,7 @@ const EventList = async ({ dateParam }) => {
         : new Date();
 
     // Fetch events from the database
-    const events = await prisma.events.findMany({
+    const events = await prisma.event.findMany({
       where: {
         startTime: {
           gte: new Date(date.setHours(0, 0, 0, 0)), // Start of day

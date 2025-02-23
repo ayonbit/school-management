@@ -140,7 +140,7 @@ const EventListPage = async ({ searchParams }) => {
     // query.OR = [{ classId: null }, { class: query.classId[role] || {} }];
 
     const [data, count] = await prisma.$transaction([
-      prisma.events.findMany({
+      prisma.event.findMany({
         where: query,
         include: {
           class: true,
@@ -148,7 +148,7 @@ const EventListPage = async ({ searchParams }) => {
         take: Item_Per_Page,
         skip: Item_Per_Page * (p - 1),
       }),
-      prisma.events.count({
+      prisma.event.count({
         where: query,
       }),
     ]);

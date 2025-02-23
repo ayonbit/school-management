@@ -1,4 +1,4 @@
-import FormModal from "@/app/components/FormModal";
+import FormContainer from "@/app/components/FormContainer";
 import Pagination from "@/app/components/Pagination";
 import Table from "@/app/components/Table";
 import TableSearch from "@/app/components/TableSearch";
@@ -48,8 +48,8 @@ const renderRow = (item, role) => {
           </Link>
           {role === "admin" && (
             <>
-              <FormModal table="teacher" type="update" data={item} />
-              <FormModal table="teacher" type="delete" id={item.id} />
+              <FormContainer table="teacher" type="update" data={item} />
+              <FormContainer table="teacher" type="delete" id={item.id} />
             </>
           )}
         </div>
@@ -99,7 +99,7 @@ const TeachersListPage = async ({ searchParams }) => {
       }
     }
   }
-//NO Role Base Conditions . Only Admin Can run CRUD Operations
+  //NO Role Base Conditions . Only Admin Can run CRUD Operations
   const [data, count] = await prisma.$transaction([
     prisma.teacher.findMany({
       where: query,
@@ -173,7 +173,9 @@ const TeachersListPage = async ({ searchParams }) => {
             <button className="w-8 h-8 flex items-center justify-center rounded-full bg-ayonYellow">
               <Image src="/sort.png" alt="filter" width={14} height={14} />
             </button>
-            {role === "admin" && <FormModal table="teacher" type="create" />}
+            {role === "admin" && (
+              <FormContainer table="teacher" type="create" />
+            )}
           </div>
         </div>
       </div>

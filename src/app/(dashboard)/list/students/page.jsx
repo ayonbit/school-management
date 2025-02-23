@@ -1,4 +1,4 @@
-import FormModal from "@/app/components/FormModal";
+import FormContainer from "@/app/components/FormContainer";
 import Pagination from "@/app/components/Pagination";
 import Table from "@/app/components/Table";
 import TableSearch from "@/app/components/TableSearch";
@@ -40,8 +40,8 @@ const renderRow = (item, role) => {
           </Link>
           {role === "admin" && (
             <>
-              <FormModal table="student" type="update" data={item} />
-              <FormModal table="student" type="delete" id={item.id} />
+              <FormContainer table="student" type="update" data={item} />
+              <FormContainer table="student" type="delete" id={item.id} />
             </>
           )}
         </div>
@@ -156,7 +156,9 @@ const StudentsListPage = async ({ searchParams }) => {
             <button className="w-8 h-8 flex items-center justify-center rounded-full bg-ayonYellow">
               <Image src="/sort.png" alt="filter" width={14} height={14} />
             </button>
-            {role === "admin" && <FormModal table="student" type="create" />}
+            {role === "admin" && (
+              <FormContainer table="student" type="create" />
+            )}
           </div>
         </div>
       </div>

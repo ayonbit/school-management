@@ -5,17 +5,22 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "react-toastify";
-import { deleteClass, deleteSubject } from "../lib/actions";
+import {
+  deleteClass,
+  deleteStudent,
+  deleteSubject,
+  deleteTeacher,
+} from "../lib/actions";
 
 const deleteActionMap = {
   subject: deleteSubject,
   class: deleteClass,
-  //teacher: deleteTeacher,
-  //student: deleteStudent,
-  // exam: deleteExam,
+  teacher: deleteTeacher,
+  student: deleteStudent,
+  //exam: deleteExam,
   // // TODO: OTHER DELETE ACTIONS
   // parent: deleteSubject,
-  // lesson: deleteSubject,
+  //lesson: deleteSubject,
   // assignment: deleteSubject,
   // result: deleteSubject,
   // attendance: deleteSubject,
@@ -37,6 +42,15 @@ const SubjectForm = dynamic(() => import("./Forms/SubjectForm"), {
 const ClassForm = dynamic(() => import("./Forms/ClassForm"), {
   loading: () => <h1>Loading...</h1>,
 });
+
+const LessonForm = dynamic(() => import("./Forms/LessonForm"), {
+  loading: () => <h1>Loading...</h1>,
+});
+
+const ExamForm = dynamic(() => import("./Forms/ExamForm"), {
+  loading: () => <h1>Loading...</h1>,
+});
+
 // TODO: OTHER FORMS
 
 const forms = {
@@ -79,8 +93,17 @@ const forms = {
       setOpen={setOpen}
       relatedData={relatedData}
     />
-    // TODO OTHER LIST ITEMS
   ),
+  lesson: (setOpen, type, data, relatedData) => (
+    <LessonForm
+      type={type}
+      data={data}
+      setOpen={setOpen}
+      relatedData={relatedData}
+    />
+  ),
+
+  // TODO OTHER LIST ITEMS
 };
 
 const FormModal = ({ table, type, data, id, relatedData }) => {

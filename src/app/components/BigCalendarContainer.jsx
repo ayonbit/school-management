@@ -4,7 +4,7 @@ import BigCalendar from "./BigCalendar";
 
 const BigCalendarContainer = async ({ type, id }) => {
   try {
-    const dataRes = await prisma.lessons.findMany({
+    const dataRes = await prisma.lesson.findMany({
       where: {
         ...(type === "teacherId" ? { teacherId: id } : { classId: id }),
       },
