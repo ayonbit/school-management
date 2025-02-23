@@ -1,12 +1,11 @@
 "use client";
-import Image from "next/image";
-
 import { createTeacher, updateTeacher } from "@/app/lib/actions";
 import { teacherSchema } from "@/app/lib/fromValidationSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CldUploadWidget } from "next-cloudinary";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import InputField from "../InputField";
@@ -23,6 +22,13 @@ const TeacherForm = ({ type, data, setOpen, relatedData }) => {
   const [img, setImg] = useState();
   const [state, setState] = useState({ success: false, error: false });
   const router = useRouter();
+
+  // Initialize the img state with the existing image URL
+  useEffect(() => {
+    if (data?.img) {
+      setImg({ secure_url: data.img });
+    }
+  }, [data]);
 
   const onSubmit = handleSubmit(async (formData) => {
     console.log("Form Data Submitted:", formData);
@@ -158,7 +164,7 @@ const TeacherForm = ({ type, data, setOpen, relatedData }) => {
             multiple
             className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
             {...register("subjects")}
-            defaultValue={data?.subjects}
+            defaultValue={data?.subjects?.map((subject) => subject.id)} // Pre-select subjects
           >
             {subjects.map((subject) => (
               <option value={subject.id} key={subject.id}>
