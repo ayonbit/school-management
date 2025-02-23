@@ -132,15 +132,31 @@ export const deleteClass = async (data) => {
 export const createTeacher = async (data) => {
   try {
     const validation = validateData(data, teacherSchema);
+    console.log("Validation Result:", validation);
     if (!validation.success) return validation;
 
-    const user = await clerkClient.users.createUser({
-      username: data.username,
-      password: data.password,
-      firstName: data.name,
-      lastName: data.surname,
-      publicMetadata: { role: "teacher" },
+    const response = await fetch("https://api.clerk.dev/v1/users", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.CLERK_SECRET_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email_address: [data.email], // Clerk expects an array for emails
+        username: data.username,
+        password: data.password,
+        first_name: data.name,
+        last_name: data.surname,
+        public_metadata: { role: "teacher" },
+      }),
     });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(`Clerk API Error: ${JSON.stringify(errorData)}`);
+    }
+
+    const user = await response.json();
 
     await prisma.teacher.create({
       data: {
@@ -165,58 +181,80 @@ export const createTeacher = async (data) => {
 
     return { success: true, error: false };
   } catch (err) {
-    console.log(err);
-    return { success: false, error: true };
+    console.error("Error creating Clerk user:", err.message);
+    return { success: false, error: true, message: err.message };
   }
 };
 
 export const updateTeacher = async (data) => {
-  if (!data.id) return { success: false, error: true };
+  if (!data.id)
+    return { success: false, error: true, message: "No ID provided" };
 
   try {
-    const user = await clerkClient.users.updateUser(data.id, {
-      username: data.username,
-      ...(data.password !== "" && { password: data.password }),
-      firstName: data.name,
-      lastName: data.surname,
+    console.log("Updating user with ID:", data.id);
+
+    const response = await fetch(`https://api.clerk.dev/v1/users/${data.id}`, {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${process.env.CLERK_SECRET_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        username: data.username,
+        ...(data.password ? { password: data.password } : {}),
+        first_name: data.name,
+        last_name: data.surname,
+      }),
     });
 
-    await prisma.teacher.update({
-      where: { id: data.id },
-      data: {
-        ...(data.password !== "" && { password: data.password }),
-        username: data.username,
-        name: data.name,
-        surname: data.surname,
-        email: data.email || null,
-        phone: data.phone || null,
-        address: data.address,
-        img: data.img || null,
-        bloodType: data.bloodType,
-        sex: data.sex,
-        birthday: data.birthday,
-        subjects: {
-          set: data.subjects?.map((subjectId) => ({ id: parseInt(subjectId) })),
-        },
-      },
-    });
+    if (!response.ok) {
+      throw new Error(`Failed to update user: ${await response.text()}`);
+    }
+
+    const user = await response.json();
+    console.log("Updated Clerk user successfully:", user);
 
     return { success: true, error: false };
   } catch (err) {
-    console.log(err);
-    return { success: false, error: true };
+    console.error("Error updating user:", err);
+    return { success: false, error: true, message: err.message };
   }
 };
 
 export const deleteTeacher = async (data) => {
   const id = data.get("id");
+
   try {
-    await clerkClient.users.deleteUser(id);
+    console.log("Deleting user with ID:", id);
+
+    const clerkApiKey = process.env.CLERK_SECRET_KEY; // Ensure this is set in .env
+    if (!clerkApiKey) throw new Error("Clerk API key is missing");
+
+    const response = await fetch(`https://api.clerk.dev/v1/users/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${clerkApiKey}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(
+        `Clerk API Error: ${errorData.message || response.statusText}`
+      );
+    }
+
+    console.log(`Successfully deleted Clerk user: ${id}`);
+
+    // Delete from database
     await prisma.teacher.delete({ where: { id } });
+    console.log(`Successfully deleted teacher from database: ${id}`);
+
     return { success: true, error: false };
   } catch (err) {
-    console.log(err);
-    return { success: false, error: true };
+    console.error("Error deleting user:", err.message);
+    return { success: false, error: true, message: err.message };
   }
 };
 
