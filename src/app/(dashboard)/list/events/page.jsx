@@ -5,47 +5,46 @@ import TableSearch from "@/app/components/TableSearch";
 import prisma from "@/app/lib/prisma";
 import { Item_Per_Page } from "@/app/lib/settings";
 import { auth } from "@clerk/nextjs/server";
-
 import Image from "next/image";
 
-const renderRow = (item, role) => {
-  return (
-    <tr
-      key={item.id}
-      className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-ayonPurpleLight"
-    >
-      <td className="flex items-center gap-4 p-4">{item.title}</td>
-      <td>{item.class?.name || "N/A"}</td>
-      <td className="hidden md:table-cell">
-        {new Intl.DateTimeFormat("en-US").format(new Date(item.startTime))}
-      </td>
-      <td className="hidden md:table-cell">
-        {new Date(item.startTime).toLocaleTimeString("en-US", {
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: false,
-        })}
-      </td>
-      <td className="hidden md:table-cell">
-        {new Date(item.endTime).toLocaleTimeString("en-US", {
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: false,
-        })}
-      </td>
-      <td>
-        <div className="flex items-center gap-2">
-          {role === "admin" && (
-            <>
-              <FormModal table="event" type="update" data={item} />
-              <FormModal table="event" type="delete" id={item.id} />
-            </>
-          )}
-        </div>
-      </td>
-    </tr>
-  );
-};
+export const dynamic = "force-dynamic";
+
+const renderRow = (item, role) => (
+  <tr
+    key={item.id}
+    className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-ayonPurpleLight"
+  >
+    <td className="flex items-center gap-4 p-4">{item.title}</td>
+    <td>{item.class?.name || "N/A"}</td>
+    <td className="hidden md:table-cell">
+      {new Intl.DateTimeFormat("en-US").format(new Date(item.startTime))}
+    </td>
+    <td className="hidden md:table-cell">
+      {new Date(item.startTime).toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+      })}
+    </td>
+    <td className="hidden md:table-cell">
+      {new Date(item.endTime).toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+      })}
+    </td>
+    <td>
+      <div className="flex items-center gap-2">
+        {role === "admin" && (
+          <>
+            <FormModal table="event" type="update" data={item} />
+            <FormModal table="event" type="delete" id={item.id} />
+          </>
+        )}
+      </div>
+    </td>
+  </tr>
+);
 
 const EventListPage = async ({ searchParams }) => {
   try {
@@ -60,113 +59,43 @@ const EventListPage = async ({ searchParams }) => {
     }
 
     const role = sessionClaims?.metadata?.role;
-
     const params = await searchParams;
     const { page, ...queryParams } = params;
     const p = parseInt(page) || 1;
-
-    // URL PARAMS CONDITIONS
     const query = {};
 
-    if (queryParams) {
-      for (const [key, value] of Object.entries(queryParams)) {
-        if (value !== undefined) {
-          switch (key) {
-            case "search":
-              query.title = { contains: value, mode: "insensitive" };
-              break;
-            default:
-              break;
-          }
-        }
-      }
+    if (queryParams?.search) {
+      query.title = { contains: queryParams.search, mode: "insensitive" };
     }
 
-    //   // Role Base Conditions
-
-    // const roleConditions = {
-    //   teacher: { class: { lessons: { some: { teacherId: currentUserId } } } },
-    //   student: { class: { students: { some: { id: currentUserId } } } },
-    //   parent: { class: { students: { some: { parentId: currentUserId } } } },
-    // };
-
-    // {
-    //  =>* NOT WORKING * ##CLASS ID NULL not working
-    // =>** when general event is created under no classId it not working ,
-    // => if no classId it should be work for all roles
-
-    // query.OR = [
-    //   { classId: null },
-    //   {
-    //     class: roleConditions[role] || {},
-    //   },
-    // ];
-
-    // Role Base Conditions
     switch (role) {
-      case "admin":
-        break;
       case "teacher":
-        query.class = {
-          lessons: {
-            some: {
-              teacherId: currentUserId,
-            },
-          },
-        };
+        query.class = { lessons: { some: { teacherId: currentUserId } } };
         break;
       case "student":
-        query.class = {
-          students: {
-            some: {
-              id: currentUserId,
-            },
-          },
-        };
+        query.class = { students: { some: { id: currentUserId } } };
         break;
       case "parent":
-        query.class = {
-          students: {
-            some: {
-              parentId: currentUserId,
-            },
-          },
-        };
+        query.class = { students: { some: { parentId: currentUserId } } };
         break;
       default:
         break;
     }
 
-    // query.OR = [{ classId: null }, { class: query.classId[role] || {} }];
-
     const [data, count] = await prisma.$transaction([
       prisma.event.findMany({
         where: query,
-        include: {
-          class: true,
-        },
+        include: { class: true },
         take: Item_Per_Page,
         skip: Item_Per_Page * (p - 1),
       }),
-      prisma.event.count({
-        where: query,
-      }),
+      prisma.event.count({ where: query }),
     ]);
 
     const columns = [
-      {
-        header: "Title",
-        accessor: "title",
-      },
-      {
-        header: "Class",
-        accessor: "class",
-      },
-      {
-        header: "Date",
-        accessor: "date",
-        className: "hidden md:table-cell",
-      },
+      { header: "Title", accessor: "title" },
+      { header: "Class", accessor: "class" },
+      { header: "Date", accessor: "date", className: "hidden md:table-cell" },
       {
         header: "Start Time",
         accessor: "startTime",
@@ -177,21 +106,13 @@ const EventListPage = async ({ searchParams }) => {
         accessor: "endTime",
         className: "hidden md:table-cell",
       },
-      ...(role === "admin"
-        ? [
-            {
-              header: "Actions",
-              accessor: "action",
-            },
-          ]
-        : []),
+      ...(role === "admin" ? [{ header: "Actions", accessor: "action" }] : []),
     ];
 
     return (
       <div className="bg-white p-4 rounded-md flex-1 m-4 mt-0">
-        {/* TOP */}
         <div className="flex items-center justify-between">
-          <h1 className=" hidden md:block text-lg font-semibold">All Events</h1>
+          <h1 className="hidden md:block text-lg font-semibold">All Events</h1>
           <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
             <TableSearch />
             <div className="flex items-center gap-4 self-end">
@@ -205,16 +126,11 @@ const EventListPage = async ({ searchParams }) => {
             </div>
           </div>
         </div>
-        {/* LIST */}
-        <div>
-          <Table
-            columns={columns}
-            renderRow={(item) => renderRow(item, role)}
-            data={data}
-          />
-        </div>
-
-        {/* PAGINATION */}
+        <Table
+          columns={columns}
+          renderRow={(item) => renderRow(item, role)}
+          data={data}
+        />
         <Pagination page={p} count={count} />
       </div>
     );
