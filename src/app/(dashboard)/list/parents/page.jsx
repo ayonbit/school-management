@@ -19,7 +19,12 @@ const renderRow = (item, role) => {
           <p className=" text-xs text-gray-500">{item?.email}</p>
         </div>
       </td>
-      <td>{item.id}</td>
+      {role === "admin" && (
+        <>
+          <td>{item.id}</td>
+        </>
+      )}
+
       <td className="hidden md:table-cell ">
         {item.students.map((student) => student.name).join(",")}{" "}
       </td>
@@ -92,11 +97,17 @@ const ParentsListPage = async ({ searchParams }) => {
       header: "Parent Name",
       accessor: "info",
     },
-    {
-      header: "Parent Id",
-      accessor: "parentId",
-      className: "hidden md:table-cell",
-    },
+
+    ...(role === "admin"
+      ? [
+          {
+            header: "Parent Id",
+            accessor: "parentId",
+            className: "hidden md:table-cell",
+          },
+        ]
+      : []),
+
     {
       header: "Student Name",
       accessor: "student",

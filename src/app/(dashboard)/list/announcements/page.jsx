@@ -1,15 +1,19 @@
-import FormModal from "@/app/components/FormModal";
+import FormContainer from "@/app/components/FormContainer";
 import Pagination from "@/app/components/Pagination";
 import Table from "@/app/components/Table";
 import TableSearch from "@/app/components/TableSearch";
 import prisma from "@/app/lib/prisma";
 import { Item_Per_Page } from "@/app/lib/settings";
+import { getSearchParams } from "@/app/lib/utils";
 import { auth } from "@clerk/nextjs/server";
 import Image from "next/image";
 
-export const dynamic = "force-dynamic"; // Ensure dynamic rendering
+// Mark the page as dynamic
+export const dynamic = "force-dynamic";
 
 const AnnouncementListPage = async ({ searchParams }) => {
+  const { page, searchQuery } = await getSearchParams(searchParams); // Correctly waiting for async function
+
   try {
     // Fetch authentication details
     const authResponse = await auth();
@@ -20,22 +24,25 @@ const AnnouncementListPage = async ({ searchParams }) => {
     }
 
     const role = sessionClaims?.metadata?.role;
-    const page = parseInt(searchParams?.page) || 1;
-    const searchQuery = searchParams?.search || "";
 
-    // Construct query based on role
-    const query = {
-      ...(searchQuery && {
-        title: { contains: searchQuery, mode: "insensitive" },
-      }),
-    };
+    let query = {};
 
-    if (role === "teacher") {
-      query.class = { lessons: { some: { teacherId: currentUserId } } };
-    } else if (role === "student") {
-      query.class = { students: { some: { id: currentUserId } } };
-    } else if (role === "parent") {
-      query.class = { students: { some: { parentId: currentUserId } } };
+    if (searchQuery) {
+      query.title = { contains: searchQuery, mode: "insensitive" };
+    }
+
+    if (role !== "admin") {
+      // Only filter for non-admins
+      const roleConditions = {
+        teacher: { lessons: { some: { teacherId: currentUserId } } },
+        student: { students: { some: { id: currentUserId } } },
+        parent: { students: { some: { parentId: currentUserId } } },
+      };
+
+      query.OR = [
+        { classId: null }, // General announcements
+        { class: roleConditions[role] || {} }, // Role-based class announcements
+      ];
     }
 
     // Fetch announcements and count using Prisma transaction
@@ -54,7 +61,7 @@ const AnnouncementListPage = async ({ searchParams }) => {
         {/* TOP SECTION */}
         <div className="flex items-center justify-between">
           <h1 className="hidden md:block text-lg font-semibold">
-            All Announcements
+            Announcements
           </h1>
           <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
             <TableSearch />
@@ -66,7 +73,7 @@ const AnnouncementListPage = async ({ searchParams }) => {
                 <Image src="/sort.png" alt="sort" width={14} height={14} />
               </button>
               {role === "admin" && (
-                <FormModal table="announcement" type="create" />
+                <FormContainer table="announcement" type="create" />
               )}
             </div>
           </div>
@@ -92,14 +99,24 @@ const AnnouncementListPage = async ({ searchParams }) => {
               className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-gray-100"
             >
               <td className="p-3">{item.title}</td>
-              <td className="p-3">{item.class?.name || "N/A"}</td>
+              <td className="p-3">
+                {item.class?.name ? item.class.name : item.description}
+              </td>
               <td className="p-3 hidden md:table-cell">
                 {new Intl.DateTimeFormat("en-US").format(new Date(item.date))}
               </td>
               {role === "admin" && (
                 <td className="p-3 flex gap-2">
-                  <FormModal table="announcement" type="update" data={item} />
-                  <FormModal table="announcement" type="delete" id={item.id} />
+                  <FormContainer
+                    table="announcement"
+                    type="update"
+                    data={item}
+                  />
+                  <FormContainer
+                    table="announcement"
+                    type="delete"
+                    id={item.id}
+                  />
                 </td>
               )}
             </tr>
@@ -120,5 +137,4 @@ const AnnouncementListPage = async ({ searchParams }) => {
     );
   }
 };
-
 export default AnnouncementListPage;

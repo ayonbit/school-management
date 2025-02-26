@@ -58,3 +58,13 @@ export const adjustScheduleToCurrentWeek = (lessons) => {
     })
     .filter(Boolean);
 };
+
+export const getSearchParams = async (searchParams) => {
+  const params = await searchParams;
+
+  return {
+    page: parseInt(params?.page) || 1,
+    searchQuery: params?.search || "",
+    supervisorId: params?.supervisorId || null,
+  };
+};

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import {
+  deleteAnnouncement,
   deleteClass,
   deleteExam,
   deleteParent,
@@ -27,7 +28,7 @@ const deleteActionMap = {
   // result: deleteSubject,
   // attendance: deleteSubject,
   // event: deleteSubject,
-  // announcement: deleteSubject,
+  announcement: deleteAnnouncement,
 };
 
 // USE LAZY LOADING
@@ -55,7 +56,13 @@ const LessonForm = dynamic(() => import("./Forms/LessonForm"), {
 const ExamForm = dynamic(() => import("./Forms/ExamForm"), {
   loading: () => <h1>Loading...</h1>,
 });
+const AssignmentForm = dynamic(() => import("./Forms/AssignmentForm"), {
+  loading: () => <h1>Loading...</h1>,
+});
 
+const AnnouncementForm = dynamic(() => import("./Forms/AnnouncementForm"), {
+  loading: () => <h1>Loading...</h1>,
+});
 // TODO: OTHER FORMS
 
 const forms = {
@@ -115,7 +122,22 @@ const forms = {
       relatedData={relatedData}
     />
   ),
-
+  assignment: (setOpen, type, data, relatedData) => (
+    <AssignmentForm
+      type={type}
+      data={data}
+      setOpen={setOpen}
+      relatedData={relatedData}
+    />
+  ),
+  announcement: (setOpen, type, data, relatedData) => (
+    <AnnouncementForm
+      type={type}
+      data={data}
+      setOpen={setOpen}
+      relatedData={relatedData}
+    />
+  ),
   // TODO OTHER LIST ITEMS
 };
 

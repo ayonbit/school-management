@@ -2,6 +2,7 @@
 "use server";
 
 import {
+  announcementSchema,
   classSchema,
   examSchema,
   parentSchema,
@@ -665,5 +666,109 @@ export const deleteExam = async (data) => {
   } catch (err) {
     console.log(err);
     return { success: false, error: true };
+  }
+};
+
+//Assignment Action
+//Announcement Action
+
+// Create Announcement
+export const createAnnouncement = async (data) => {
+  try {
+    const validation = announcementSchema.safeParse(data);
+    if (!validation.success) {
+      return {
+        success: false,
+        error: validation.error.errors[0].message,
+      };
+    }
+
+    await prisma.announcement.create({
+      data: {
+        title: data.title,
+        description: data.description,
+        date: new Date(data.date),
+        classId: data.classId && data.classId !== "" ? data.classId : null, // Convert empty string to null
+      },
+    });
+
+    return { success: true };
+  } catch (err) {
+    console.error("Create Announcement Error:", err);
+    return { success: false, error: err.message };
+  }
+};
+
+// Update Announcement
+export const updateAnnouncement = async (data) => {
+  try {
+    console.log("Received Data:", data); // Debugging log
+
+    if (!data.id || isNaN(Number(data.id))) {
+      console.error("Invalid ID:", data.id);
+      return {
+        success: false,
+        error: "Valid Announcement ID is required for update.",
+      };
+    }
+
+    // Validate input data
+    const validation = announcementSchema.safeParse(data);
+    if (!validation.success) {
+      console.error("Validation Error:", validation.error.errors);
+      return {
+        success: false,
+        error: validation.error.errors[0].message,
+      };
+    }
+
+    // Convert ID to a number explicitly
+    const announcementId = Number(data.id);
+
+    // Check if the announcement exists
+    const existingAnnouncement = await prisma.announcement.findUnique({
+      where: { id: announcementId },
+    });
+
+    console.log("Existing Announcement:", existingAnnouncement); // Debugging log
+
+    if (!existingAnnouncement) {
+      return { success: false, error: "Announcement not found." };
+    }
+
+    // Update announcement
+    const updatedAnnouncement = await prisma.announcement.update({
+      where: { id: announcementId },
+      data: {
+        title: data.title,
+        description: data.description,
+        date: new Date(data.date),
+        classId: data.classId ? Number(data.classId) : null, // Convert to null if empty
+      },
+    });
+
+    console.log("Updated Announcement:", updatedAnnouncement); // Debugging log
+
+    return { success: true };
+  } catch (err) {
+    console.error("Update Announcement Error:", err);
+    return { success: false, error: err.message };
+  }
+};
+
+// Delete Announcement
+export const deleteAnnouncement = async (data) => {
+  const id = data.get("id");
+  try {
+    await prisma.announcement.delete({
+      where: {
+        id: parseInt(id),
+      },
+    });
+
+    return { success: true };
+  } catch (err) {
+    console.error("Delete Announcement Error:", err);
+    return { success: false, error: err.message };
   }
 };

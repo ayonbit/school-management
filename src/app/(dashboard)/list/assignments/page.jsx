@@ -1,15 +1,19 @@
-import FormModal from "@/app/components/FormModal";
+import FormContainer from "@/app/components/FormContainer";
 import Pagination from "@/app/components/Pagination";
 import Table from "@/app/components/Table";
 import TableSearch from "@/app/components/TableSearch";
 import prisma from "@/app/lib/prisma";
 import { Item_Per_Page } from "@/app/lib/settings";
+import { getSearchParams } from "@/app/lib/utils";
 import { auth } from "@clerk/nextjs/server";
 import Image from "next/image";
 
 export const dynamic = "force-dynamic";
-
 const AssignmentListPage = async ({ searchParams }) => {
+  const { page, searchQuery, classId, teacherId } = await getSearchParams(
+    searchParams
+  ); // Ensure searchParams is awaited
+
   try {
     const authResponse = await auth();
     const { sessionClaims, userId: currentUserId } = authResponse || {};
@@ -18,10 +22,10 @@ const AssignmentListPage = async ({ searchParams }) => {
     }
 
     const role = sessionClaims?.metadata?.role;
-    const page = parseInt(searchParams?.page) || 1;
-    const searchQuery = searchParams?.search || "";
-    const classId = searchParams?.classId || null;
-    const teacherId = searchParams?.teacherId || null;
+
+    // Ensure classId and teacherId are parsed correctly
+    const classIdParsed = classId ? parseInt(classId) : null;
+    const teacherIdParsed = teacherId || null;
 
     // Build Prisma query
     const query = {
@@ -29,8 +33,8 @@ const AssignmentListPage = async ({ searchParams }) => {
         ...(searchQuery && {
           subject: { name: { contains: searchQuery, mode: "insensitive" } },
         }),
-        ...(classId && { classId: parseInt(classId) }),
-        ...(teacherId && { teacherId }),
+        ...(classIdParsed && { classId: classIdParsed }),
+        ...(teacherIdParsed && { teacherId: teacherIdParsed }),
       },
     };
 
@@ -88,7 +92,7 @@ const AssignmentListPage = async ({ searchParams }) => {
                 <Image src="/sort.png" alt="sort" width={14} height={14} />
               </button>
               {(role === "admin" || role === "teacher") && (
-                <FormModal table="assignment" type="create" />
+                <FormContainer table="assignment" type="create" />
               )}
             </div>
           </div>
@@ -134,8 +138,12 @@ const AssignmentListPage = async ({ searchParams }) => {
                 <div className="flex items-center gap-2">
                   {(role === "admin" || role === "teacher") && (
                     <>
-                      <FormModal table="assignment" type="update" data={item} />
-                      <FormModal
+                      <FormContainer
+                        table="assignment"
+                        type="update"
+                        data={item}
+                      />
+                      <FormContainer
                         table="assignment"
                         type="delete"
                         id={item.id}

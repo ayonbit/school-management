@@ -1,7 +1,7 @@
 // fromValidationSchema.js
 import { z } from "zod";
 
-// Base User Schema (Reusable)
+// Base User Schema (Reusable) validation
 const baseUserSchema = z.object({
   username: z
     .string()
@@ -24,7 +24,7 @@ const baseUserSchema = z.object({
   img: z.string().optional(),
 });
 
-// Subject Schema
+// Subject Schema validation
 export const subjectSchema = z.object({
   id: z.coerce.number().optional(),
   name: z.string().min(1, { message: "Subject name is required!" }),
@@ -40,7 +40,7 @@ export const classSchema = z.object({
   supervisorId: z.coerce.string().optional(),
 });
 
-// Teacher Schema
+// Teacher Schema validation
 export const teacherSchema = baseUserSchema.extend({
   id: z.string().optional(),
   bloodType: z.string().min(1, { message: "Blood Type is required!" }),
@@ -60,7 +60,7 @@ export const studentSchema = baseUserSchema.extend({
   parentId: z.string().min(1, { message: "Parent Id is required!" }),
 });
 
-//exam schema
+//exam schema validation
 export const examSchema = z.object({
   id: z.coerce.number().optional(),
   title: z.string().min(1, { message: "Title name is required!" }),
@@ -69,7 +69,7 @@ export const examSchema = z.object({
   lessonId: z.coerce.number({ message: "Lesson is required!" }),
 });
 
-//Parent Schema
+//Parent Schema validation
 
 // Only used for updates  //Base User Schema is Same so no need new validation
 export const parentSchema = baseUserSchema
@@ -80,3 +80,24 @@ export const parentSchema = baseUserSchema
     message: "Password is required for new parents!",
     path: ["password"],
   });
+
+//Assignment Schema validation
+
+export const assignmentSchema = z.object({});
+
+//Announcement Schema Validation
+export const announcementSchema = z.object({
+  id: z.coerce.number().optional(),
+  title: z.string().min(1, { message: "Title is required!" }),
+  description: z
+    .string()
+    .min(5, { message: "Description must be at least 5 characters long" }),
+  date: z.coerce
+    .date()
+    .refine((date) => date instanceof Date && !isNaN(date.getTime()), {
+      message: "Invalid date format",
+    }),
+
+  // Ensure `classId` is either a number or null
+  classId: z.union([z.coerce.number(), z.null()]).optional(),
+});

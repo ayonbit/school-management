@@ -4,12 +4,17 @@ import Table from "@/app/components/Table";
 import TableSearch from "@/app/components/TableSearch";
 import prisma from "@/app/lib/prisma";
 import { Item_Per_Page } from "@/app/lib/settings";
+import { getSearchParams } from "@/app/lib/utils";
 import { auth } from "@clerk/nextjs/server";
 import Image from "next/image";
 
 export const dynamic = "force-dynamic"; // Ensure real-time data updates
 
 const ClassesListPage = async ({ searchParams }) => {
+  const { page, searchQuery, supervisorId } = await getSearchParams(
+    searchParams
+  );
+
   try {
     // Authenticate user
     const authResponse = await auth();
@@ -20,9 +25,6 @@ const ClassesListPage = async ({ searchParams }) => {
     }
 
     const role = sessionClaims?.metadata?.role;
-    const page = parseInt(searchParams?.page) || 1;
-    const searchQuery = searchParams?.search || "";
-    const supervisorId = searchParams?.supervisorId || null;
 
     // Build Prisma query
     const query = {
