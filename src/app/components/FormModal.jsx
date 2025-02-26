@@ -7,10 +7,11 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 import {
   deleteClass,
+  deleteExam,
+  deleteParent,
   deleteStudent,
   deleteSubject,
   deleteTeacher,
-  deleteExam
 } from "../lib/actions";
 
 const deleteActionMap = {
@@ -19,8 +20,8 @@ const deleteActionMap = {
   teacher: deleteTeacher,
   student: deleteStudent,
   exam: deleteExam,
-  // // TODO: OTHER DELETE ACTIONS
-  // parent: deleteSubject,
+  parent: deleteParent,
+  // TODO: OTHER DELETE ACTIONS
   //lesson: deleteSubject,
   // assignment: deleteSubject,
   // result: deleteSubject,
@@ -35,6 +36,9 @@ const TeacherForm = dynamic(() => import("./Forms/TeacherForm"), {
   loading: () => <h1>Loading...</h1>,
 });
 const StudentForm = dynamic(() => import("./Forms/StudentForm"), {
+  loading: () => <h1>Loading...</h1>,
+});
+const ParentForm = dynamic(() => import("./Forms/ParentForm"), {
   loading: () => <h1>Loading...</h1>,
 });
 const SubjectForm = dynamic(() => import("./Forms/SubjectForm"), {
@@ -81,6 +85,14 @@ const forms = {
   ),
   student: (setOpen, type, data, relatedData) => (
     <StudentForm
+      type={type}
+      data={data}
+      setOpen={setOpen}
+      relatedData={relatedData}
+    />
+  ),
+  parent: (setOpen, type, data, relatedData) => (
+    <ParentForm
       type={type}
       data={data}
       setOpen={setOpen}

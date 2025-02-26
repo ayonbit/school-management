@@ -143,6 +143,7 @@ const StudentForm = ({ type, data, setOpen, relatedData }) => {
           defaultValue={data?.parentId}
           register={register}
           error={errors.parentId}
+          placeholder={"Check Parent List"}
         />
         {data && (
           <InputField

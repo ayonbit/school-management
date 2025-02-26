@@ -9,7 +9,7 @@ const baseUserSchema = z.object({
     .max(20, { message: "Username must be at most 20 characters long!" }),
   password: z
     .string()
-    .min(6, { message: "Password must be at least 6 characters long!" })
+    .min(8, { message: "Password must be at least 8 characters long!" })
     .optional()
     .or(z.literal("")),
   name: z.string().min(1, { message: "First name is required!" }),
@@ -68,3 +68,15 @@ export const examSchema = z.object({
   endTime: z.coerce.date({ message: "End time is required!" }),
   lessonId: z.coerce.number({ message: "Lesson is required!" }),
 });
+
+//Parent Schema
+
+// Only used for updates  //Base User Schema is Same so no need new validation
+export const parentSchema = baseUserSchema
+  .extend({
+    id: z.string().optional(),
+  })
+  .refine((data) => data.password || data.id, {
+    message: "Password is required for new parents!",
+    path: ["password"],
+  });

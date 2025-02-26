@@ -4,6 +4,7 @@
 import {
   classSchema,
   examSchema,
+  parentSchema,
   studentSchema,
   subjectSchema,
   teacherSchema,
@@ -433,6 +434,141 @@ export const deleteStudent = async (data) => {
   } catch (err) {
     console.error("Error deleting user:", err.message);
     return { success: false, error: true, message: err.message };
+  }
+};
+//Parent Action
+export const createParent = async (data) => {
+  try {
+    const validation = validateData(data, parentSchema);
+    if (!validation.success) return validation;
+
+    // Create a user in Clerk (if needed)
+    const response = await fetch("https://api.clerk.dev/v1/users", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.CLERK_SECRET_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email_address: [data.email], // Clerk expects an array for emails
+        username: data.username,
+        password: data.password,
+        first_name: data.name,
+        last_name: data.surname,
+        public_metadata: { role: "parent" }, // Set role as parent
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(`Clerk API Error: ${JSON.stringify(errorData)}`);
+    }
+
+    const user = await response.json();
+
+    // Create parent in the database
+    await prisma.parent.create({
+      data: {
+        id: user.id, // Use Clerk user ID
+        username: data.username,
+        name: data.name,
+        surname: data.surname,
+        email: data.email || null,
+        phone: data.phone,
+        address: data.address,
+      },
+    });
+
+    return { success: true, error: null };
+  } catch (err) {
+    console.error("Error creating parent:", err.message);
+    return { success: false, error: err.message };
+  }
+};
+export const updateParent = async (data) => {
+  if (!data.id) return { success: false, error: "No ID provided" };
+
+  try {
+    const validation = validateData(data, parentSchema);
+    if (!validation.success) return validation;
+
+    // Update user in Clerk (if needed)
+    const response = await fetch(`https://api.clerk.dev/v1/users/${data.id}`, {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${process.env.CLERK_SECRET_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        username: data.username,
+        ...(data.password ? { password: data.password } : {}),
+        first_name: data.name,
+        last_name: data.surname,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to update user: ${await response.text()}`);
+    }
+
+    const user = await response.json();
+    console.log("Updated Clerk user successfully:", user);
+
+    // Update parent in the database
+    await prisma.parent.update({
+      where: { id: data.id },
+      data: {
+        username: data.username,
+        name: data.name,
+        surname: data.surname,
+        email: data.email || null,
+        phone: data.phone,
+        address: data.address,
+        students: {
+          set: data.students?.map((studentId) => ({ id: studentId })), // Update connected students
+        },
+      },
+    });
+
+    return { success: true, error: null };
+  } catch (err) {
+    console.error("Error updating parent:", err.message);
+    return { success: false, error: err.message };
+  }
+};
+export const deleteParent = async (data) => {
+  const id = data.get("id");
+
+  try {
+    // Delete user from Clerk (if needed)
+    const clerkApiKey = process.env.CLERK_SECRET_KEY; // Ensure this is set in .env
+    if (!clerkApiKey) throw new Error("Clerk API key is missing");
+
+    const response = await fetch(`https://api.clerk.dev/v1/users/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${clerkApiKey}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(
+        `Clerk API Error: ${errorData.message || response.statusText}`
+      );
+    }
+
+    console.log(`Successfully deleted Clerk user: ${id}`);
+
+    // Delete parent from the database
+    await prisma.parent.delete({ where: { id } });
+    console.log(`Successfully deleted parent from database: ${id}`);
+
+    return { success: true, error: null };
+  } catch (err) {
+    console.error("Error deleting parent:", err.message);
+    return { success: false, error: err.message };
   }
 };
 

@@ -1,4 +1,4 @@
-import FormModal from "@/app/components/FormModal";
+import FormContainer from "@/app/components/FormContainer";
 import Pagination from "@/app/components/Pagination";
 import Table from "@/app/components/Table";
 import TableSearch from "@/app/components/TableSearch";
@@ -15,10 +15,11 @@ const renderRow = (item, role) => {
     >
       <td className="flex items-center gap-4 p-4">
         <div className="flex flex-col">
-          <h3 className="font-semibold">{item.name}</h3>
+          <h3 className="font-semibold">{item.name + " " + item.surname} </h3>
           <p className=" text-xs text-gray-500">{item?.email}</p>
         </div>
       </td>
+      <td>{item.id}</td>
       <td className="hidden md:table-cell ">
         {item.students.map((student) => student.name).join(",")}{" "}
       </td>
@@ -28,8 +29,8 @@ const renderRow = (item, role) => {
         <div className="flex items-center gap-2">
           {role === "admin" && (
             <>
-              <FormModal table="parent" type="update" data={item} />
-              <FormModal table="parent" type="delete" id={item.id} />
+              <FormContainer table="parent" type="update" data={item} />
+              <FormContainer table="parent" type="delete" id={item.id} />
             </>
           )}
         </div>
@@ -71,8 +72,8 @@ const ParentsListPage = async ({ searchParams }) => {
       }
     }
   }
-//NO Role Base Condition Apply For this page 
-//Only Admin can apply CRUD operations
+  //NO Role Base Condition Apply For this page
+  //Only Admin can apply CRUD operations
   const [data, count] = await prisma.$transaction([
     prisma.parent.findMany({
       where: query,
@@ -90,6 +91,11 @@ const ParentsListPage = async ({ searchParams }) => {
     {
       header: "Parent Name",
       accessor: "info",
+    },
+    {
+      header: "Parent Id",
+      accessor: "parentId",
+      className: "hidden md:table-cell",
     },
     {
       header: "Student Name",
@@ -130,7 +136,7 @@ const ParentsListPage = async ({ searchParams }) => {
             <button className="w-8 h-8 flex items-center justify-center rounded-full bg-ayonYellow">
               <Image src="/sort.png" alt="filter" width={14} height={14} />
             </button>
-            {role === "admin" && <FormModal table="parent" type="create" />}
+            {role === "admin" && <FormContainer table="parent" type="create" />}
           </div>
         </div>
       </div>
