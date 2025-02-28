@@ -27,7 +27,6 @@ const deleteActionMap = {
   //lesson: deleteSubject,
   // assignment: deleteSubject,
   // result: deleteSubject,
-  // attendance: deleteSubject,
   event: deleteEvent,
   announcement: deleteAnnouncement,
 };
@@ -68,7 +67,11 @@ const AnnouncementForm = dynamic(() => import("./Forms/AnnouncementForm"), {
 const EventForm = dynamic(() => import("./Forms/EventForm"), {
   loading: () => <h1>Loading...</h1>,
 });
-// TODO: OTHER FORMS
+
+const ResultForm = dynamic(() => import("./Forms/ResultForm"), {
+  loading: () => <h1>Loading...</h1>,
+});
+
 
 const forms = {
   subject: (setOpen, type, data, relatedData) => (
@@ -151,7 +154,14 @@ const forms = {
       relatedData={relatedData}
     />
   ),
-  // TODO OTHER LIST ITEMS
+  result: (setOpen, type, data, relatedData) => (
+    <ResultForm
+      type={type}
+      data={data}
+      setOpen={setOpen}
+      relatedData={relatedData}
+    />
+  ),
 };
 
 const FormModal = ({ table, type, data, id, relatedData }) => {
