@@ -1,4 +1,4 @@
-import FormModal from "@/app/components/FormModal";
+import FormContainer from "@/app/components/FormContainer";
 import Pagination from "@/app/components/Pagination";
 import Table from "@/app/components/Table";
 import TableSearch from "@/app/components/TableSearch";
@@ -15,7 +15,7 @@ const renderRow = (item, role) => (
     className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-ayonPurpleLight"
   >
     <td className="flex items-center gap-4 p-4">{item.title}</td>
-    <td>{item.class?.name || "N/A"}</td>
+    <td>{item.class?.name ? item.class.name : item.description}</td>
     <td className="hidden md:table-cell">
       {new Intl.DateTimeFormat("en-US").format(new Date(item.startTime))}
     </td>
@@ -23,22 +23,22 @@ const renderRow = (item, role) => (
       {new Date(item.startTime).toLocaleTimeString("en-US", {
         hour: "2-digit",
         minute: "2-digit",
-        hour12: false,
+        hour12: true,
       })}
     </td>
     <td className="hidden md:table-cell">
       {new Date(item.endTime).toLocaleTimeString("en-US", {
         hour: "2-digit",
         minute: "2-digit",
-        hour12: false,
+        hour12: true,
       })}
     </td>
     <td>
       <div className="flex items-center gap-2">
         {role === "admin" && (
           <>
-            <FormModal table="event" type="update" data={item} />
-            <FormModal table="event" type="delete" id={item.id} />
+            <FormContainer table="event" type="update" data={item} />
+            <FormContainer table="event" type="delete" id={item.id} />
           </>
         )}
       </div>
@@ -122,7 +122,9 @@ const EventListPage = async ({ searchParams }) => {
               <button className="w-8 h-8 flex items-center justify-center rounded-full bg-ayonYellow">
                 <Image src="/sort.png" alt="filter" width={14} height={14} />
               </button>
-              {role === "admin" && <FormModal table="event" type="create" />}
+              {role === "admin" && (
+                <FormContainer table="event" type="create" />
+              )}
             </div>
           </div>
         </div>

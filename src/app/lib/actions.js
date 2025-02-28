@@ -4,6 +4,7 @@
 import {
   announcementSchema,
   classSchema,
+  eventSchema,
   examSchema,
   parentSchema,
   studentSchema,
@@ -669,10 +670,7 @@ export const deleteExam = async (data) => {
   }
 };
 
-//Assignment Action
 //Announcement Action
-
-// Create Announcement
 export const createAnnouncement = async (data) => {
   try {
     const validation = announcementSchema.safeParse(data);
@@ -699,7 +697,6 @@ export const createAnnouncement = async (data) => {
   }
 };
 
-// Update Announcement
 export const updateAnnouncement = async (data) => {
   try {
     console.log("Received Data:", data); // Debugging log
@@ -756,11 +753,95 @@ export const updateAnnouncement = async (data) => {
   }
 };
 
-// Delete Announcement
 export const deleteAnnouncement = async (data) => {
   const id = data.get("id");
   try {
     await prisma.announcement.delete({
+      where: {
+        id: parseInt(id),
+      },
+    });
+
+    return { success: true };
+  } catch (err) {
+    console.error("Delete Announcement Error:", err);
+    return { success: false, error: err.message };
+  }
+};
+
+//Event Actions
+
+export const createEvent = async (data) => {
+  try {
+    const validation = eventSchema.safeParse(data);
+    if (!validation.success) {
+      return {
+        success: false,
+        error: validation.error.errors[0].message,
+      };
+    }
+
+    await prisma.event.create({
+      data: {
+        title: data.title,
+        description: data.description,
+        startTime: data.startTime,
+        endTime: data.endTime,
+        classId: data.classId && data.classId !== "" ? data.classId : null, // Convert empty string to null
+      },
+    });
+
+    return { success: true };
+  } catch (err) {
+    console.error("Create Event Error:", err);
+    return { success: false, error: err.message };
+  }
+};
+
+export const updateEvent = async (data) => {
+  try {
+    const validation = validateData(data, eventSchema);
+    if (!validation.success) return validation;
+
+    // Convert ID to a number explicitly
+    const eventId = Number(data.id);
+
+    // Check if the announcement exists
+    const existingEvent = await prisma.event.findUnique({
+      where: { id: eventId },
+    });
+
+    console.log("Existing Event:", existingEvent); // Debugging log
+
+    if (!existingEvent) {
+      return { success: false, error: "Event not found." };
+    }
+
+    // Update announcement
+    const updatedEvent = await prisma.event.update({
+      where: { id: eventId },
+      data: {
+        title: data.title,
+        description: data.description,
+        startTime: data.startTime,
+        endTime: data.endTime,
+        classId: data.classId ? Number(data.classId) : null, // Convert to null if empty
+      },
+    });
+
+    console.log("Updated Event:", updatedEvent); // Debugging log
+
+    return { success: true, error: false };
+  } catch (err) {
+    console.log(err);
+    return { success: false, error: true };
+  }
+};
+
+export const deleteEvent = async (data) => {
+  const id = data.get("id");
+  try {
+    await prisma.event.delete({
       where: {
         id: parseInt(id),
       },

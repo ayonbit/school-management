@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
 import {
   deleteAnnouncement,
   deleteClass,
+  deleteEvent,
   deleteExam,
   deleteParent,
   deleteStudent,
@@ -27,7 +28,7 @@ const deleteActionMap = {
   // assignment: deleteSubject,
   // result: deleteSubject,
   // attendance: deleteSubject,
-  // event: deleteSubject,
+  event: deleteEvent,
   announcement: deleteAnnouncement,
 };
 
@@ -61,6 +62,10 @@ const AssignmentForm = dynamic(() => import("./Forms/AssignmentForm"), {
 });
 
 const AnnouncementForm = dynamic(() => import("./Forms/AnnouncementForm"), {
+  loading: () => <h1>Loading...</h1>,
+});
+
+const EventForm = dynamic(() => import("./Forms/EventForm"), {
   loading: () => <h1>Loading...</h1>,
 });
 // TODO: OTHER FORMS
@@ -132,6 +137,14 @@ const forms = {
   ),
   announcement: (setOpen, type, data, relatedData) => (
     <AnnouncementForm
+      type={type}
+      data={data}
+      setOpen={setOpen}
+      relatedData={relatedData}
+    />
+  ),
+  event: (setOpen, type, data, relatedData) => (
+    <EventForm
       type={type}
       data={data}
       setOpen={setOpen}

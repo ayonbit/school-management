@@ -69,9 +69,7 @@ export const examSchema = z.object({
   lessonId: z.coerce.number({ message: "Lesson is required!" }),
 });
 
-//Parent Schema validation
-
-// Only used for updates  //Base User Schema is Same so no need new validation
+//Parent Schema validation//  *** Only used for updates  //Base User Schema is Same so no need new validation
 export const parentSchema = baseUserSchema
   .extend({
     id: z.string().optional(),
@@ -80,10 +78,6 @@ export const parentSchema = baseUserSchema
     message: "Password is required for new parents!",
     path: ["password"],
   });
-
-//Assignment Schema validation
-
-export const assignmentSchema = z.object({});
 
 //Announcement Schema Validation
 export const announcementSchema = z.object({
@@ -100,4 +94,16 @@ export const announcementSchema = z.object({
 
   // Ensure `classId` is either a number or null
   classId: z.union([z.coerce.number(), z.null()]).optional(),
+});
+
+//Event Schema Validation
+export const eventSchema = z.object({
+  id: z.coerce.number().optional(),
+  title: z.string().min(1, { message: "Title name is required!" }),
+  description: z
+    .string()
+    .min(5, { message: "Description must be at least 5 characters long" }),
+  startTime: z.coerce.date({ message: "Start time is required!" }),
+  endTime: z.coerce.date({ message: "End time is required!" }),
+  classId: z.coerce.number({ message: "Lesson is required!" }),
 });
