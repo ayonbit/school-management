@@ -107,3 +107,11 @@ export const eventSchema = z.object({
   endTime: z.coerce.date({ message: "End time is required!" }),
   classId: z.coerce.number({ message: "Lesson is required!" }),
 });
+
+export const assignmentSchema = z.object({
+  id: z.coerce.number().optional(),
+  title: z.string().min(1, { message: "Title name is required!" }),
+  startDate: z.coerce.date({ message: "Start time is required!" }),
+  dueDate: z.coerce.date({ message: "End time is required!" }),
+  lessonId: z.coerce.number({ message: "Lesson is required!" }),
+});

@@ -109,7 +109,12 @@ const AssignmentListPage = async ({ searchParams }) => {
               className: "hidden md:table-cell",
             },
             {
-              header: "Date",
+              header: "Start Date",
+              accessor: "startDate",
+              className: "hidden md:table-cell",
+            },
+            {
+              header: "Due Date",
               accessor: "dueDate",
               className: "hidden md:table-cell",
             },
@@ -128,6 +133,11 @@ const AssignmentListPage = async ({ searchParams }) => {
               <td>{item.lesson.class.name}</td>
               <td className="hidden md:table-cell">
                 {item.lesson.teacher.name + " " + item.lesson.teacher.surname}
+              </td>
+              <td className="hidden md:table-cell">
+                {new Intl.DateTimeFormat("en-us").format(
+                  new Date(item.startDate)
+                )}
               </td>
               <td className="hidden md:table-cell">
                 {new Intl.DateTimeFormat("en-us").format(

@@ -7,6 +7,7 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 import {
   deleteAnnouncement,
+  deleteAssignment,
   deleteClass,
   deleteEvent,
   deleteExam,
@@ -25,8 +26,9 @@ const deleteActionMap = {
   parent: deleteParent,
   // TODO: OTHER DELETE ACTIONS
   //lesson: deleteSubject,
-  // assignment: deleteSubject,
   // result: deleteSubject,
+  assignment: deleteAssignment,
+
   event: deleteEvent,
   announcement: deleteAnnouncement,
 };
@@ -71,7 +73,6 @@ const EventForm = dynamic(() => import("./Forms/EventForm"), {
 const ResultForm = dynamic(() => import("./Forms/ResultForm"), {
   loading: () => <h1>Loading...</h1>,
 });
-
 
 const forms = {
   subject: (setOpen, type, data, relatedData) => (

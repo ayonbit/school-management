@@ -1,8 +1,8 @@
-// actions.js
 "use server";
 
 import {
   announcementSchema,
+  assignmentSchema,
   classSchema,
   eventSchema,
   examSchema,
@@ -575,7 +575,6 @@ export const deleteParent = async (data) => {
 };
 
 //Exam Action
-
 export const createExam = async (data) => {
   // const { userId, sessionClaims } = auth();
   // const role = (sessionClaims?.metadata as { role?: string })?.role;
@@ -851,5 +850,63 @@ export const deleteEvent = async (data) => {
   } catch (err) {
     console.error("Delete Announcement Error:", err);
     return { success: false, error: err.message };
+  }
+};
+
+//Assignment Actions
+export const createAssignment = async (data) => {
+  try {
+    const validation = validateData(data, assignmentSchema);
+    if (!validation.success) return validation;
+    await prisma.assignment.create({
+      data: {
+        title: data.title,
+        startDate: data.startDate,
+        dueDate: data.dueDate,
+        lessonId: data.lessonId,
+      },
+    });
+    return { success: true, error: false };
+  } catch (err) {
+    console.log(err);
+    return { success: false, error: true };
+  }
+};
+export const updateAssignment = async (data) => {
+  try {
+    const validation = validateData(data, assignmentSchema);
+    if (!validation.success) return validation;
+    await prisma.assignment.update({
+      where: {
+        id: data.id,
+      },
+      data: {
+        title: data.title,
+        startDate: data.startDate,
+        dueDate: data.dueDate,
+        lessonId: data.lessonId,
+      },
+    });
+
+    return { success: true, error: false };
+  } catch (err) {
+    console.log(err);
+    return { success: false, error: true };
+  }
+};
+export const deleteAssignment = async (data) => {
+  const id = data.get("id");
+
+  try {
+    await prisma.assignment.delete({
+      where: {
+        id: parseInt(id),
+      },
+    });
+
+    return { success: true, error: false };
+  } catch (err) {
+    console.log(err);
+    return { success: false, error: true };
   }
 };
