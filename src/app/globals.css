@@ -108,3 +108,29 @@
   color: gray !important;
   margin-bottom: 5px !important;
 }
+.rbc-event {
+  font-size: 16px !important; /* Bigger text */
+  padding: 12px !important; /* More space inside */
+  border-radius: 6px !important;
+  background-color: #4f46e5 !important;
+  color: rgb(167, 166, 166) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  word-wrap: break-word !important; /* Ensures long text wraps */
+}
+
+.rbc-day-bg {
+  min-height: 100px; /* Increase row height */
+}
+
+.rbc-time-slot {
+  min-height: 40px !important; /* Increase row height for hourly view */
+}
+.rbc-event-content {
+  font-size: 16px !important;
+  font-weight: bold !important;
+  white-space: normal !important;
+  overflow: visible !important;
+}
