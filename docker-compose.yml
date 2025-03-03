@@ -1,0 +1,55 @@
+version: "3.8"
+
+services:
+  # Next.js App
+  app:
+    container_name: nextjs_app
+    build: .
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+      - /app/node_modules
+    restart: unless-stopped
+    command: ["sh", "-c", "npx prisma migrate deploy && npm run start"]
+
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15
+    container_name: postgres_db
+    restart: always
+    ports:
+      - "5432:5432"
+    env_file:
+      - .env # Load environment variables from .env file
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+  healthcheck:
+  test: ["CMD-SHELL", "./healthcheck.sh"]
+  interval: 10s
+  timeout: 5s
+  retries: 5
+
+
+  # Prisma Studio (Optional)
+  prisma-studio:
+    image: node:20
+    container_name: prisma_studio
+    working_dir: /app
+    volumes:
+      - .:/app
+    command: ["npx", "prisma", "studio"]
+    ports:
+      - "5555:5555"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+    driver: local

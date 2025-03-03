@@ -1,9 +1,8 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
 # dependencies
 /node_modules
 /.pnp
 .pnp.*
+
 .yarn/*
 !.yarn/patches
 !.yarn/plugins
@@ -13,34 +12,49 @@
 # testing
 /coverage
 
-# next.js
+# Next.js
 /.next/
 /out/
 
-# production
+# Production
 /build
 
-# misc
+# Misc
 .DS_Store
 *.pem
 
-# debug
+# Debug logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
+# Environment variables (DO NOT COMMIT SECRETS)
 .env*
+!.env.example # Keep a sample env file
 
-# vercel
+# Vercel
 .vercel
 
-# typescript
+# TypeScript
 *.tsbuildinfo
 next-env.d.ts
 
 # Prisma
 .prisma
-# clerk configuration (can include secrets)
+!prisma/migrations/
+
+# Clerk configuration (can include secrets)
 /.clerk/
+
+# Database dumps and generated files
+*.sql
+
+# Docker
+.dockerignore
+docker-compose.override.yml
+
+# Logs
+*.log
+logs
+/logs/*
