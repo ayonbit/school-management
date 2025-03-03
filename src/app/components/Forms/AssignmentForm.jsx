@@ -18,9 +18,13 @@ const AssignmentForm = ({ type, data, setOpen, relatedData }) => {
     resolver: zodResolver(assignmentSchema),
     defaultValues: {
       title: data?.title || "",
-      startDate: data?.startDate || "",
-      dueDate: data?.dueDate || "",
-      lessonId: data?.lessonId || "",
+      startDate: data?.startDate
+        ? new Date(data.startDate).toISOString().slice(0, 16)
+        : "", // Fix for startDate
+      dueDate: data?.dueDate
+        ? new Date(data.dueDate).toISOString().slice(0, 16)
+        : "", // Fix for dueDate
+      lessonId: data?.lessonId || "", // Default value for lessonId
     },
   });
 
@@ -74,6 +78,7 @@ const AssignmentForm = ({ type, data, setOpen, relatedData }) => {
           name="title"
           register={register}
           error={errors?.title}
+          placeholder={"e.g. Assignment 1"}
         />
         <InputField
           label="Start Date"
@@ -96,8 +101,13 @@ const AssignmentForm = ({ type, data, setOpen, relatedData }) => {
           <label className="text-xs text-gray-500">Lesson</label>
           <select
             className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
-            {...register("lessonId")}
+            {...register("lessonId", { required: "Lesson is required" })}
+            defaultValue={data?.lessonId || ""}
           >
+            <option value="" disabled>
+              Select Lesson
+            </option>
+
             {lessons.map((lesson) => (
               <option value={lesson.id} key={lesson.id}>
                 {lesson.name}

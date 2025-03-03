@@ -57,7 +57,7 @@ const StudentForm = ({ type, data, setOpen, relatedData }) => {
   return (
     <form className="flex flex-col gap-8" onSubmit={onSubmit}>
       <h1 className="text-xl font-semibold">
-        {type === "create" ? "Create a new student" : "Update the student"}
+        {type === "create" ? "Create a new Student" : "Update the Student"}
       </h1>
 
       {/* Authentication Information */}
@@ -71,6 +71,7 @@ const StudentForm = ({ type, data, setOpen, relatedData }) => {
           defaultValue={data?.username}
           register={register}
           error={errors?.username}
+          placeholder={"e.g. johndoe123"}
         />
         <InputField
           label="Email"
@@ -78,6 +79,7 @@ const StudentForm = ({ type, data, setOpen, relatedData }) => {
           defaultValue={data?.email}
           register={register}
           error={errors?.email}
+          placeholder={"email is required"}
         />
         <InputField
           label="Password"
@@ -86,6 +88,7 @@ const StudentForm = ({ type, data, setOpen, relatedData }) => {
           defaultValue={data?.password}
           register={register}
           error={errors?.password}
+          placeholder={"Aa1! 8 characters"}
         />
       </div>
 
@@ -100,6 +103,7 @@ const StudentForm = ({ type, data, setOpen, relatedData }) => {
           defaultValue={data?.name}
           register={register}
           error={errors.name}
+          placeholder={"John"}
         />
         <InputField
           label="Last Name"
@@ -107,6 +111,7 @@ const StudentForm = ({ type, data, setOpen, relatedData }) => {
           defaultValue={data?.surname}
           register={register}
           error={errors.surname}
+          placeholder={"Doe"}
         />
         <InputField
           label="Phone"
@@ -114,6 +119,7 @@ const StudentForm = ({ type, data, setOpen, relatedData }) => {
           defaultValue={data?.phone}
           register={register}
           error={errors.phone}
+          placeholder={"01234567890"}
         />
         <InputField
           label="Address"
@@ -121,6 +127,7 @@ const StudentForm = ({ type, data, setOpen, relatedData }) => {
           defaultValue={data?.address}
           register={register}
           error={errors.address}
+          placeholder={"123 Main St, City, Country"}
         />
         <InputField
           label="Blood Type"
@@ -128,6 +135,7 @@ const StudentForm = ({ type, data, setOpen, relatedData }) => {
           defaultValue={data?.bloodType}
           register={register}
           error={errors.bloodType}
+          placeholder={"e.g. O+"}
         />
         <InputField
           label="Birthday"
@@ -187,17 +195,22 @@ const StudentForm = ({ type, data, setOpen, relatedData }) => {
       {/* Dropdowns for Sex, Grade, and Class */}
       <div className="flex justify-between flex-wrap gap-4">
         <div className="flex flex-col gap-2 w-full md:w-1/4">
-          <label className="text-xs text-gray-500">Sex</label>
+          <label className="text-xs text-gray-500">Gender</label>
           <select
             className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
-            {...register("sex")}
-            defaultValue={data?.sex}
+            {...register("sex", { required: "Gender is required" })}
+            defaultValue={data?.sex || ""}
           >
+            <option value="" disabled>
+              Select Gender
+            </option>
             <option value="MALE">Male</option>
             <option value="FEMALE">Female</option>
           </select>
           {errors.sex?.message && (
-            <p className="text-xs text-red-400">{errors.sex.message}</p>
+            <p className="text-xs text-red-400">
+              {errors.sex.message.toString()}
+            </p>
           )}
         </div>
 
@@ -205,9 +218,12 @@ const StudentForm = ({ type, data, setOpen, relatedData }) => {
           <label className="text-xs text-gray-500">Grade</label>
           <select
             className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
-            {...register("gradeId")}
-            defaultValue={data?.gradeId}
+            {...register("gradeId", { required: "Grade is required" })}
+            defaultValue={data?.gradeId || ""}
           >
+            <option value="" disabled>
+              Select Grade
+            </option>
             {grades.map((grade) => (
               <option value={grade.id} key={grade.id}>
                 {grade.level}
@@ -223,12 +239,16 @@ const StudentForm = ({ type, data, setOpen, relatedData }) => {
           <label className="text-xs text-gray-500">Class</label>
           <select
             className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
-            {...register("classId")}
-            defaultValue={data?.classId}
+            {...register("classId", { required: "Class is required" })}
+            defaultValue={data?.classId || ""}
           >
+            <option value="" disabled>
+              Select Class
+            </option>{" "}
+            {/* Placeholder option */}
             {classes.map((classItem) => (
               <option value={classItem.id} key={classItem.id}>
-                {classItem.name} - {classItem._count.students}/
+                {classItem.name} - {classItem._count?.students || 0}/
                 {classItem.capacity}
               </option>
             ))}

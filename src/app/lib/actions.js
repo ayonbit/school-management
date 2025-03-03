@@ -6,6 +6,7 @@ import {
   classSchema,
   eventSchema,
   examSchema,
+  lessonSchema,
   parentSchema,
   studentSchema,
   subjectSchema,
@@ -71,11 +72,15 @@ export const updateSubject = async (data) => {
 };
 
 export const deleteSubject = async (data) => {
+  const id = data.get("id");
   try {
-    const id = parseInt(data.get("id"));
-    if (!id) return { success: false, error: "Invalid subject ID" };
-    await prisma.subject.delete({ where: { id } });
-    return { success: true, error: null };
+    await prisma.subject.delete({
+      where: {
+        id: parseInt(id),
+      },
+    });
+
+    return { success: true, error: false };
   } catch (err) {
     console.error("Error deleting Subject:", err);
     return {
@@ -899,6 +904,83 @@ export const deleteAssignment = async (data) => {
 
   try {
     await prisma.assignment.delete({
+      where: {
+        id: parseInt(id),
+      },
+    });
+
+    return { success: true, error: false };
+  } catch (err) {
+    console.log(err);
+    return { success: false, error: true };
+  }
+};
+
+//Lesson Actions
+
+export const createLesson = async (data) => {
+  try {
+    const validation = lessonSchema.safeParse(data);
+    if (!validation.success)
+      return { success: false, error: validation.error.format() };
+
+    // Create the lesson
+    await prisma.lesson.create({
+      data: {
+        name: data.name,
+        day: data.day,
+        startTime: new Date(data.startTime), // Ensure DateTime format
+        endTime: new Date(data.endTime), // Ensure DateTime format
+        class: { connect: { id: data.classId } },
+        subject: { connect: { id: data.subjectId } },
+        teacher: { connect: { id: data.teacherId } },
+      },
+    });
+
+    return { success: true };
+  } catch (err) {
+    console.error("Error creating Lesson:", err);
+    return { success: false, error: err.message || "Failed to create Lesson." };
+  }
+};
+
+export const updateLesson = async (data) => {
+  try {
+    if (!data.id) return { success: false, error: "Lesson ID is required." };
+
+    const validation = lessonSchema.safeParse(data);
+    if (!validation.success)
+      return { success: false, error: validation.error.format() };
+
+    // Update the lesson
+    await prisma.lesson.update({
+      where: { id: data.id },
+      data: {
+        name: data.name,
+        day: data.day,
+        startTime: new Date(data.startTime), // Ensure DateTime format
+        endTime: new Date(data.endTime), // Ensure DateTime format
+        class: { connect: { id: data.classId } },
+        subject: { connect: { id: data.subjectId } },
+        teacher: { connect: { id: data.teacherId } },
+      },
+    });
+
+    return { success: true };
+  } catch (err) {
+    console.error("Error updating Lesson:", err);
+    return {
+      success: false,
+      error: "Failed to update Lesson. Please try again.",
+    };
+  }
+};
+
+export const deleteLesson = async (data) => {
+  const id = data.get("id");
+
+  try {
+    await prisma.lesson.delete({
       where: {
         id: parseInt(id),
       },

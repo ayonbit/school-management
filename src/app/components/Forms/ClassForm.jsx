@@ -58,6 +58,7 @@ const ClassForm = ({ type, data, setOpen, relatedData }) => {
           defaultValue={data?.name}
           register={register}
           error={errors?.name}
+          placeholder={"e.g. Class 1A"}
         />
         <InputField
           label="Capacity"
@@ -65,6 +66,7 @@ const ClassForm = ({ type, data, setOpen, relatedData }) => {
           defaultValue={data?.capacity}
           register={register}
           error={errors?.capacity}
+          placeholder={"e.g. 30"}
         />
         {data && (
           <InputField

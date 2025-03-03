@@ -19,7 +19,9 @@ const SubjectForm = ({ type, data, setOpen, relatedData }) => {
     defaultValues: {
       name: data?.name || "",
       id: data?.id || "",
-      teachers: data?.teachers || [],
+      teachers: data?.teachers
+        ? data.teachers.map((teacher) => teacher.id)
+        : [],
     },
   });
 
@@ -58,7 +60,7 @@ const SubjectForm = ({ type, data, setOpen, relatedData }) => {
   return (
     <form className="flex flex-col gap-8" onSubmit={onSubmit}>
       <h1 className="text-xl font-semibold">
-        {type === "create" ? "Create a new subject" : "Update the subject"}
+        {type === "create" ? "Create a new Subject" : "Update the Subject"}
       </h1>
 
       <div className="flex justify-between flex-wrap gap-4">
@@ -67,6 +69,7 @@ const SubjectForm = ({ type, data, setOpen, relatedData }) => {
           name="name"
           register={register}
           error={errors?.name}
+          placeholder={"e.g. Mathematics"}
         />
         {data && (
           <InputField

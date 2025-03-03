@@ -59,6 +59,7 @@ const parentForm = ({ type, data, setOpen }) => {
           defaultValue={data?.username}
           register={register}
           error={errors?.username}
+          placeholder={"e.g. johndoe123"}
         />
         <InputField
           label="Email"
@@ -66,6 +67,7 @@ const parentForm = ({ type, data, setOpen }) => {
           defaultValue={data?.email}
           register={register}
           error={errors?.email}
+          placeholder={"email is required"}
         />
         <InputField
           label="Password"
@@ -74,6 +76,7 @@ const parentForm = ({ type, data, setOpen }) => {
           defaultValue={data?.password || ""}
           register={register}
           error={errors?.password}
+          placeholder={"Aa1! 8 characters"}
         />
       </div>
 
@@ -88,6 +91,7 @@ const parentForm = ({ type, data, setOpen }) => {
           defaultValue={data?.name}
           register={register}
           error={errors.name}
+          placeholder={"John"}
         />
         <InputField
           label="Last Name"
@@ -95,6 +99,7 @@ const parentForm = ({ type, data, setOpen }) => {
           defaultValue={data?.surname}
           register={register}
           error={errors.surname}
+          placeholder={"Doe"}
         />
         <InputField
           label="Phone"
@@ -102,6 +107,7 @@ const parentForm = ({ type, data, setOpen }) => {
           defaultValue={data?.phone}
           register={register}
           error={errors.phone}
+          placeholder={"01234567890"}
         />
         <InputField
           label="Address"
@@ -109,6 +115,7 @@ const parentForm = ({ type, data, setOpen }) => {
           defaultValue={data?.address}
           register={register}
           error={errors.address}
+          placeholder={"123 Main St, City, Country"}
         />
 
         {data && (

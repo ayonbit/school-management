@@ -72,8 +72,8 @@ const AnnouncementForm = ({ type, data, setOpen, relatedData }) => {
     <form className="flex flex-col gap-6" onSubmit={onSubmit}>
       <h1 className="text-xl font-semibold">
         {type === "create"
-          ? "Create a new announcement"
-          : "Update the announcement"}
+          ? "Create a new Announcement"
+          : "Update the Announcement"}
       </h1>
       <div className="flex justify-between py-2 px-4 flex-wrap gap-4">
         <InputField
@@ -81,6 +81,7 @@ const AnnouncementForm = ({ type, data, setOpen, relatedData }) => {
           name="title"
           register={register}
           error={errors?.title}
+          placeholder={"e.g. School Closure"}
         />
         <InputField
           label="Description"
@@ -88,6 +89,7 @@ const AnnouncementForm = ({ type, data, setOpen, relatedData }) => {
           register={register}
           error={errors?.description}
           type="textarea"
+          placeholder={"e.g. School will be closed due to heavy rainfall"}
         />
         <InputField
           label="Date"
@@ -104,14 +106,13 @@ const AnnouncementForm = ({ type, data, setOpen, relatedData }) => {
             {...register("classId")}
             defaultValue={data?.classId || ""}
           >
-            <option value="">None</option>
+            <option value="">Select Class</option> 
             {classes.map((cls) => (
               <option value={cls.id} key={cls.id}>
                 {cls.name}
               </option>
             ))}
           </select>
-
           {errors.classId?.message && (
             <p className="text-xs text-red-400">{errors.classId.message}</p>
           )}

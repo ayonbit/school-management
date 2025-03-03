@@ -18,8 +18,12 @@ const ExamForm = ({ type, data, setOpen, relatedData }) => {
     resolver: zodResolver(examSchema),
     defaultValues: {
       title: data?.title || "",
-      startTime: data?.startTime || "",
-      endTime: data?.endTime || "",
+      startTime: data?.startTime
+        ? new Date(data.startTime).toISOString().slice(0, 16)
+        : "",
+      endTime: data?.endTime
+        ? new Date(data.endTime).toISOString().slice(0, 16)
+        : "",
       lessonId: data?.lessonId || "",
     },
   });
@@ -57,7 +61,7 @@ const ExamForm = ({ type, data, setOpen, relatedData }) => {
   return (
     <form className="flex flex-col gap-8" onSubmit={onSubmit}>
       <h1 className="text-xl font-semibold">
-        {type === "create" ? "Create a new exam" : "Update the exam"}
+        {type === "create" ? "Create a new Exam" : "Update the Exam"}
       </h1>
 
       <div className="flex justify-between flex-wrap gap-4">
@@ -66,6 +70,7 @@ const ExamForm = ({ type, data, setOpen, relatedData }) => {
           name="title"
           register={register}
           error={errors?.title}
+          placeholder={"e.g. Midterm Exam"}
         />
         <InputField
           label="Start Date"
@@ -88,8 +93,13 @@ const ExamForm = ({ type, data, setOpen, relatedData }) => {
           <label className="text-xs text-gray-500">Lesson</label>
           <select
             className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
-            {...register("lessonId")}
+            {...register("lessonId", { required: "Lesson is required" })}
+            defaultValue={data?.lessonId || ""}
           >
+            <option value="" disabled>
+              Select Lesson
+            </option>{" "}
+            {/* Placeholder option */}
             {lessons.map((lesson) => (
               <option value={lesson.id} key={lesson.id}>
                 {lesson.name}

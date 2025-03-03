@@ -56,7 +56,7 @@ const TeacherForm = ({ type, data, setOpen, relatedData }) => {
   return (
     <form className="flex flex-col gap-8" onSubmit={onSubmit}>
       <h1 className="text-xl font-semibold">
-        {type === "create" ? "Create a new teacher" : "Update the teacher"}
+        {type === "create" ? "Create a new Teacher" : "Update the Teacher"}
       </h1>
       <span className="text-xs text-gray-400 font-medium">
         Authentication Information
@@ -68,6 +68,7 @@ const TeacherForm = ({ type, data, setOpen, relatedData }) => {
           defaultValue={data?.username}
           register={register}
           error={errors?.username}
+          placeholder={"e.g. johndoe123"}
         />
         <InputField
           label="Email"
@@ -75,6 +76,7 @@ const TeacherForm = ({ type, data, setOpen, relatedData }) => {
           defaultValue={data?.email}
           register={register}
           error={errors?.email}
+          placeholder={"email is required"}
         />
         <InputField
           label="Password"
@@ -83,6 +85,7 @@ const TeacherForm = ({ type, data, setOpen, relatedData }) => {
           defaultValue={data?.password}
           register={register}
           error={errors?.password}
+          placeholder={"Aa1! 8 characters"}
         />
       </div>
       <span className="text-xs text-gray-400 font-medium">
@@ -95,6 +98,7 @@ const TeacherForm = ({ type, data, setOpen, relatedData }) => {
           defaultValue={data?.name}
           register={register}
           error={errors.name}
+          placeholder={"John"}
         />
         <InputField
           label="Last Name"
@@ -102,6 +106,7 @@ const TeacherForm = ({ type, data, setOpen, relatedData }) => {
           defaultValue={data?.surname}
           register={register}
           error={errors.surname}
+          placeholder={"Doe"}
         />
         <InputField
           label="Phone"
@@ -109,6 +114,7 @@ const TeacherForm = ({ type, data, setOpen, relatedData }) => {
           defaultValue={data?.phone}
           register={register}
           error={errors.phone}
+          placeholder={"01234567890"}
         />
         <InputField
           label="Address"
@@ -116,6 +122,7 @@ const TeacherForm = ({ type, data, setOpen, relatedData }) => {
           defaultValue={data?.address}
           register={register}
           error={errors.address}
+          placeholder={"123 Main St, City, Country"}
         />
         <InputField
           label="Blood Type"
@@ -123,6 +130,7 @@ const TeacherForm = ({ type, data, setOpen, relatedData }) => {
           defaultValue={data?.bloodType}
           register={register}
           error={errors.bloodType}
+          placeholder={"e.g. A+"}
         />
         <InputField
           label="Birthday"
@@ -146,9 +154,12 @@ const TeacherForm = ({ type, data, setOpen, relatedData }) => {
           <label className="text-xs text-gray-500">Sex</label>
           <select
             className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
-            {...register("sex")}
-            defaultValue={data?.sex}
+            {...register("sex", { required: "Gender is required" })}
+            defaultValue={data?.sex || ""}
           >
+            <option value="" disabled>
+              Select Gender
+            </option>
             <option value="MALE">Male</option>
             <option value="FEMALE">Female</option>
           </select>

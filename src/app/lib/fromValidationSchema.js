@@ -45,7 +45,7 @@ export const teacherSchema = baseUserSchema.extend({
   id: z.string().optional(),
   bloodType: z.string().min(1, { message: "Blood Type is required!" }),
   dob: z.coerce.date({ message: "Birthday is required!" }),
-  sex: z.enum(["MALE", "FEMALE"], { message: "Sex is required!" }),
+  sex: z.enum(["MALE", "FEMALE"], { message: "Gender is required!" }),
   subjects: z.array(z.union([z.string(), z.number()])).default([]),
 });
 
@@ -107,11 +107,22 @@ export const eventSchema = z.object({
   endTime: z.coerce.date({ message: "End time is required!" }),
   classId: z.coerce.number({ message: "Lesson is required!" }),
 });
-
+//Assignment Schema Validation
 export const assignmentSchema = z.object({
   id: z.coerce.number().optional(),
   title: z.string().min(1, { message: "Title name is required!" }),
   startDate: z.coerce.date({ message: "Start time is required!" }),
   dueDate: z.coerce.date({ message: "End time is required!" }),
   lessonId: z.coerce.number({ message: "Lesson is required!" }),
+});
+//Lesson Schema Validation
+export const lessonSchema = z.object({
+  id: z.coerce.number().optional(),
+  name: z.string().min(3, { message: "Lesson name is required!" }),
+  day: z.enum(["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"]), // Matches Prisma Enum
+  startTime: z.coerce.date({ message: "Start time is required!" }),
+  endTime: z.coerce.date({ message: "End time is required!" }),
+  subjectId: z.coerce.number({ message: "Subject is required!" }),
+  classId: z.coerce.number({ message: "Class is required!" }),
+  teacherId: z.string({ message: "Teacher is required!" }),
 });
