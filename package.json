@@ -36,6 +36,9 @@
     "tailwindcss": "^3.4.1",
     "typescript": "^5.7.3"
   },
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  },
   "overrides": {
     "@xstate/react": "^5.0.2"
   }
