@@ -9,7 +9,16 @@ const UserCard = async ({ type }) => {
     parent: prisma.parent,
   };
 
-  const count = await modelMap[type].count();
+  let count = 0; // Default to 0
+  try {
+    if (modelMap[type]) {
+      count = await modelMap[type].count();
+    }
+  } catch (error) {
+    console.error("Error fetching count:", error);
+  }
+
+  // const count = await modelMap[type].count(); direct count query
 
   return (
     <div className="rounded-2xl odd:bg-ayonPurple even:bg-ayonYellow p-4 flex-1 min-w-[130px]">
