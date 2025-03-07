@@ -139,7 +139,7 @@ export const deleteClass = async (data) => {
 export const createTeacher = async (data) => {
   try {
     const validation = validateData(data, teacherSchema);
-    console.log("Validation Result:", validation);
+
     if (!validation.success) return validation;
 
     const response = await fetch("https://api.clerk.dev/v1/users", {
@@ -198,8 +198,6 @@ export const updateTeacher = async (data) => {
     return { success: false, error: true, message: "No ID provided" };
 
   try {
-    console.log("Updating user with ID:", data.id);
-
     const response = await fetch(`https://api.clerk.dev/v1/users/${data.id}`, {
       method: "PATCH",
       headers: {
@@ -219,7 +217,6 @@ export const updateTeacher = async (data) => {
     }
 
     const user = await response.json();
-    console.log("Updated Clerk user successfully:", user);
 
     await prisma.teacher.update({
       where: {
@@ -256,8 +253,6 @@ export const deleteTeacher = async (data) => {
   const id = data.get("id");
 
   try {
-    console.log("Deleting user with ID:", id);
-
     const clerkApiKey = process.env.CLERK_SECRET_KEY; // Ensure this is set in .env
     if (!clerkApiKey) throw new Error("Clerk API key is missing");
 
@@ -276,11 +271,8 @@ export const deleteTeacher = async (data) => {
       );
     }
 
-    console.log(`Successfully deleted Clerk user: ${id}`);
-
     // Delete from database
     await prisma.teacher.delete({ where: { id } });
-    console.log(`Successfully deleted teacher from database: ${id}`);
 
     return { success: true, error: false };
   } catch (err) {
@@ -358,8 +350,6 @@ export const updateStudent = async (data) => {
     return { success: false, error: true, message: "No ID provided" };
 
   try {
-    console.log("Updating user with ID:", data.id);
-
     const response = await fetch(`https://api.clerk.dev/v1/users/${data.id}`, {
       method: "PATCH",
       headers: {
@@ -379,7 +369,6 @@ export const updateStudent = async (data) => {
     }
 
     const user = await response.json();
-    console.log("Updated Clerk user successfully:", user);
 
     await prisma.student.update({
       where: { id: data.id },
@@ -411,8 +400,6 @@ export const updateStudent = async (data) => {
 export const deleteStudent = async (data) => {
   const id = data.get("id");
   try {
-    console.log("Deleting user with ID:", id);
-
     const clerkApiKey = process.env.CLERK_SECRET_KEY; // Ensure this is set in .env
     if (!clerkApiKey) throw new Error("Clerk API key is missing");
 
@@ -431,11 +418,8 @@ export const deleteStudent = async (data) => {
       );
     }
 
-    console.log(`Successfully deleted Clerk user: ${id}`);
-
     // Delete from database
     await prisma.student.delete({ where: { id } });
-    console.log(`Successfully deleted teacher from database: ${id}`);
 
     return { success: true, error: false };
   } catch (err) {
@@ -519,7 +503,6 @@ export const updateParent = async (data) => {
     }
 
     const user = await response.json();
-    console.log("Updated Clerk user successfully:", user);
 
     // Update parent in the database
     await prisma.parent.update({
@@ -566,11 +549,8 @@ export const deleteParent = async (data) => {
       );
     }
 
-    console.log(`Successfully deleted Clerk user: ${id}`);
-
     // Delete parent from the database
     await prisma.parent.delete({ where: { id } });
-    console.log(`Successfully deleted parent from database: ${id}`);
 
     return { success: true, error: null };
   } catch (err) {
@@ -703,8 +683,6 @@ export const createAnnouncement = async (data) => {
 
 export const updateAnnouncement = async (data) => {
   try {
-    console.log("Received Data:", data); // Debugging log
-
     if (!data.id || isNaN(Number(data.id))) {
       console.error("Invalid ID:", data.id);
       return {
@@ -731,8 +709,6 @@ export const updateAnnouncement = async (data) => {
       where: { id: announcementId },
     });
 
-    console.log("Existing Announcement:", existingAnnouncement); // Debugging log
-
     if (!existingAnnouncement) {
       return { success: false, error: "Announcement not found." };
     }
@@ -748,7 +724,7 @@ export const updateAnnouncement = async (data) => {
       },
     });
 
-    console.log("Updated Announcement:", updatedAnnouncement); // Debugging log
+    og;
 
     return { success: true };
   } catch (err) {
@@ -815,8 +791,6 @@ export const updateEvent = async (data) => {
       where: { id: eventId },
     });
 
-    console.log("Existing Event:", existingEvent); // Debugging log
-
     if (!existingEvent) {
       return { success: false, error: "Event not found." };
     }
@@ -832,8 +806,6 @@ export const updateEvent = async (data) => {
         classId: data.classId ? Number(data.classId) : null, // Convert to null if empty
       },
     });
-
-    console.log("Updated Event:", updatedEvent); // Debugging log
 
     return { success: true, error: false };
   } catch (err) {

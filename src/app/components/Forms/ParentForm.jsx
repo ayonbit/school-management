@@ -22,11 +22,10 @@ const parentForm = ({ type, data, setOpen }) => {
   const router = useRouter();
 
   const onSubmit = handleSubmit(async (formData) => {
-    console.log("Form Data Submitted:", formData);
     try {
       const action = type === "create" ? createParent : updateParent;
       const result = await action({ ...formData });
-      console.log(result);
+
       if (result?.success) {
         toast.success(
           `Parent has been ${type === "create" ? "created" : "updated"}!`

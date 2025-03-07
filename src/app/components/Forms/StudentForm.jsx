@@ -32,11 +32,10 @@ const StudentForm = ({ type, data, setOpen, relatedData }) => {
   }, [data]);
 
   const onSubmit = handleSubmit(async (formData) => {
-    console.log("Form Data Submitted:", formData);
     try {
       const action = type === "create" ? createStudent : updateStudent;
       const result = await action({ ...formData, img: img?.secure_url });
-      console.log(result);
+
       if (result?.success) {
         toast.success(
           `Student has been ${type === "create" ? "created" : "updated"}!`
